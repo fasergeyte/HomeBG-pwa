@@ -1,20 +1,22 @@
 import { Box, Card, Fab, Stack, Typography } from "@mui/material";
-import { getDb, useStoreGetAll } from "@libs/Store";
+import { useStoreAdd, useStoreDelete, useStoreGetAll } from "@libs/Store";
 import AddIcon from "@mui/icons-material/Add";
 import TextField from "@mui/material/TextField";
 import { useState } from "react";
+import { ContextMenu, ContextMenuItem } from "@libs/Common";
 
 export function Players() {
   const { data: players } = useStoreGetAll("player");
+  const { mutateAsync: addPlayer } = useStoreAdd("player");
+  const { mutateAsync: deletePlayer } = useStoreDelete("player");
+
   const [isAdding, setIsAdding] = useState<boolean>(false);
 
   const onSubmit = async (value: string) => {
     const trimmed = value.trim();
 
     if (trimmed) {
-      await (
-        await getDb()
-      ).add("player", {
+      await addPlayer({
         name: trimmed,
       });
     }
@@ -24,15 +26,24 @@ export function Players() {
 
   const onAdd = () => setIsAdding(true);
 
+  const actions: ContextMenuItem<string>[] = [
+    {
+      label: "Удалить",
+      action: (id: string) => deletePlayer(id),
+    },
+  ];
+
   return (
     <Box height={"100%"} px={1}>
       <Box>
         {players?.map((player) => (
-          <Card key={"name:" + player.name} sx={{ mb: 1, p: 1, height: 56 }}>
-            <Stack direction="row">
-              <Typography variant="h6">{player.name}</Typography>
-            </Stack>
-          </Card>
+          <ContextMenu id={player.id} actions={actions}>
+            <Card key={"name:" + player.name} sx={{ mb: 1, p: 1, height: 56 }}>
+              <Stack direction="row">
+                <Typography variant="h6">{player.name}</Typography>
+              </Stack>
+            </Card>
+          </ContextMenu>
         ))}
       </Box>
       {isAdding && (

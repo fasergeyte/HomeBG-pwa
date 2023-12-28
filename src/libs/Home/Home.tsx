@@ -4,7 +4,7 @@ import { Stack, Tabs } from "@mui/material";
 import { PlayedGames } from "@libs/PlayedGames";
 import { Players } from "@libs/Players";
 import { Games } from "@libs/Games";
-import { Slider } from "@libs/Slider";
+import { Slider } from "@libs/Common";
 
 export function Home() {
   const [activeTab, setActiveTab] = useState<number>(1);
