@@ -1,6 +1,6 @@
 import Tab from "@mui/material/Tab";
 import { useRef, useState } from "react";
-import { Stack, Tabs } from "@mui/material";
+import { Box, Stack, Tabs } from "@mui/material";
 import { PlayedGames } from "@libs/PlayedGames";
 import { Players } from "@libs/Players";
 import { Games } from "@libs/Games";
@@ -34,7 +34,9 @@ export function Home() {
       >
         <Games />
         <PlayedGames />
-        <Players />
+        <Box sx={{ height: 1 }}>
+          <Players />
+        </Box>
       </Slider>
     </Stack>
   );

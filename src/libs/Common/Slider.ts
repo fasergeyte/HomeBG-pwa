@@ -11,5 +11,13 @@ export const Slider = styled(SliderOriginal)({
   "& .slick-list, & .slick-track": {
     height: "100%",
   },
+  "& .slick-slide": {
+    height: "100%",
+    position: "relative",
+  },
+  "& .slick-slide > div": {
+    height: "100%",
+    position: "relative",
+  },
 });
 export type Slider = SliderOriginal;
