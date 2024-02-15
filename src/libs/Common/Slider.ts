@@ -1,7 +1,6 @@
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-export * from "react-slick";
 import SliderOriginal from "react-slick";
 import { styled } from "@mui/material";
 

@@ -35,14 +35,23 @@ export function Players() {
 
   return (
     <Box height={"100%"} px={1} position={"relative"}>
-      <Box>
+        <Box
+        sx={{
+          position: "absolute",
+          bottom: 0,
+          right: 0,
+          left: 0,
+          top: 0,
+          overflow: "scroll",
+        }}
+      >
         {players?.length === 0 && (
           <Typography variant="h6" color={"GrayText"} textAlign={"center"}>
             Список пуст
           </Typography>
         )}
         {players?.map((player) => (
-          <ContextMenu id={player.id} actions={actions}>
+          <ContextMenu key={player.id} id={player.id} actions={actions}>
             <Card key={"name:" + player.name} sx={{ mb: 1, p: 1, height: 56 }}>
               <Stack direction="row">
                 <Typography variant="h6">{player.name}</Typography>

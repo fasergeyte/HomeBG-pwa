@@ -54,6 +54,7 @@ export function ContextMenu<T>(props: ContextMenuProps<T>) {
       >
         {actions.map(({ label, action }) => (
           <MenuItem
+            key={label}
             onClick={() => {
               action(id);
               close();

@@ -7,8 +7,14 @@ export interface Player {
 
 export interface Game {
   name: string;
-  img?: string;
   id: string;
+}
+
+export interface PlayedGame {
+  id: string;
+  date: Date;
+  result: { place: number; playerId: string }[];
+  gameId: string;
 }
 
 export interface BgDbSchema extends idb.DBSchema {
@@ -21,6 +27,11 @@ export interface BgDbSchema extends idb.DBSchema {
     value: Game;
     key: string;
     indexes: { id: string; name: string };
+  };
+  playedGame: {
+    value: PlayedGame;
+    key: string;
+    indexes: { id: string; date: string; gameId: string };
   };
 }
 

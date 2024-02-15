@@ -78,6 +78,7 @@ export function fillMockData(
     "versionchange"
   >
 ) {
+  if (process.env.NODE_ENV === "production") return;
   players.forEach((player) => playerStore.add(player as Player));
   games.forEach((game) => gameStore.add(game as Game));
 }

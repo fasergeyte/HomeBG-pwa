@@ -1,6 +1,7 @@
 import { StoreName, StoreValue } from "./types";
 import { getDb } from "./database";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMemo } from "react";
 
 export const getStoreGetAllQueryKey = (store: StoreName) => [
   "StoreGetAllQueryKey",
@@ -12,6 +13,17 @@ export function useStoreGetAll<Name extends StoreName>(store: Name) {
     queryKey: getStoreGetAllQueryKey(store),
     queryFn: () => getDb().then((db) => db.getAll(store)),
   });
+}
+
+export function useStoreGetAllAsMap<Name extends StoreName>(store: Name) {
+  const { data: list } = useStoreGetAll(store);
+
+  const map: ReadonlyMap<string, StoreValue<Name>> | undefined = useMemo(() => {
+    if (!list) return;
+
+    return new Map(list?.map((item) => [item.id, item]));
+  }, [list]);
+  return { map };
 }
 
 export function useStoreAdd<Name extends StoreName>(store: Name) {

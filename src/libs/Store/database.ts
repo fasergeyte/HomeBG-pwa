@@ -24,6 +24,14 @@ export async function getDb() {
           });
           playerStore.createIndex("name", "name", { unique: true });
 
+          const playedGame = db.createObjectStore("playedGame", {
+            keyPath: "id",
+            autoIncrement: true,
+          });
+
+          playedGame.createIndex("date", "date", { unique: false });
+          playedGame.createIndex("gameId", "gameId", { unique: false });
+
           fillMockData(playerStore, gameStore);
         }
       }

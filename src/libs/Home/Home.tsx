@@ -1,10 +1,10 @@
 import Tab from "@mui/material/Tab";
 import { useRef, useState } from "react";
 import { Box, Stack, Tabs } from "@mui/material";
-import { PlayedGames } from "@libs/PlayedGames";
 import { Players } from "@libs/Players";
 import { Games } from "@libs/Games";
 import { Slider } from "@libs/Common";
+import { PlayedGames } from "@libs/PlayedGames";
 
 export function Home() {
   const [activeTab, setActiveTab] = useState<number>(1);

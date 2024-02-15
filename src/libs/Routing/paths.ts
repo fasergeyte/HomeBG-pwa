@@ -1,5 +1,5 @@
 export const paths = {
-    gameList: () => '/gamesList',
-    games: () => '/games',
-    players: () => '/players'
-}
+  home: () => "/",
+  games: () => "/games",
+  players: () => "/players",
+};
