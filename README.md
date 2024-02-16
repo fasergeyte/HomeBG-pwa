@@ -1,4 +1,4 @@
-# HomeBG-pwa
+# HomeHomeBG-pwa
 
 (Pet project to try pwa app.)
 App works as registry of played board games.
@@ -9,6 +9,6 @@ Try to dev:
 1. npm ci
 2. npm run dev
 
-# TODO:
+# TODO
 
 Tasks are in file: /tasks.md
