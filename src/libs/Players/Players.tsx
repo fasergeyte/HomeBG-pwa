@@ -35,7 +35,7 @@ export function Players() {
 
   return (
     <Box height={"100%"} px={1} position={"relative"}>
-        <Box
+      <Box
         sx={{
           position: "absolute",
           bottom: 0,
@@ -52,7 +52,7 @@ export function Players() {
         )}
         {players?.map((player) => (
           <ContextMenu key={player.id} id={player.id} actions={actions}>
-            <Card key={"name:" + player.name} sx={{ mb: 1, p: 1, height: 56 }}>
+            <Card key={player.name} sx={{ mb: 1, p: 1, mx: 1 }}>
               <Stack direction="row">
                 <Typography variant="h6">{player.name}</Typography>
               </Stack>

@@ -48,11 +48,14 @@ export function PlayedGameDialog(props: PlayedGameDialogProps) {
     defaultValues,
   });
   const result = watch("result");
+
   const { fields, append, remove } = useFieldArray({
     control,
     name: "result",
   });
+
   const lastPlayer = result.at(-1)?.player;
+
   React.useEffect(() => {
     if (lastPlayer || result.length === 0) {
       append({ place: result.length + 1, player: null });

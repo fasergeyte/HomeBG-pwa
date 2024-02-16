@@ -23,7 +23,7 @@ export function PlayedGameListItem(props: PlayedGameListItemProps) {
   return (
     <Card
       key={playedGame.id}
-      sx={{ mb: 1, p: 1 }}
+      sx={{ mb: 1, p: 1, mx: 1 }}
       onClick={() => onClick?.(playedGame.id)}
     >
       <Stack direction="column">

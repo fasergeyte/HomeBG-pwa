@@ -52,10 +52,8 @@ export function Games() {
         )}
         {games?.map((game) => (
           <ContextMenu key={game.id} id={game.id} actions={actions}>
-            <Card key={"name:" + game.name} sx={{ mb: 1, p: 1, height: 56 }}>
-              <Stack direction="row">
-                <Typography variant="h6">{game.name}</Typography>
-              </Stack>
+            <Card key={game.name} sx={{ mb: 1, p: 1, mx: 1 }}>
+              <Typography variant="h6">{game.name}</Typography>
             </Card>
           </ContextMenu>
         ))}

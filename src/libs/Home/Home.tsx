@@ -1,6 +1,6 @@
 import Tab from "@mui/material/Tab";
 import { useRef, useState } from "react";
-import { Box, Stack, Tabs } from "@mui/material";
+import { Stack, Tabs } from "@mui/material";
 import { Players } from "@libs/Players";
 import { Games } from "@libs/Games";
 import { Slider } from "@libs/Common";
@@ -31,12 +31,14 @@ export function Home() {
         afterChange={(index) => setActiveTab(index)}
         slidesToShow={1}
         slidesToScroll={1}
+        sx={(theme) => ({
+          backgroundColor: theme.palette.grey[100],
+          pt: 1,
+        })}
       >
         <Games />
         <PlayedGames />
-        <Box sx={{ height: 1 }}>
-          <Players />
-        </Box>
+        <Players />
       </Slider>
     </Stack>
   );
