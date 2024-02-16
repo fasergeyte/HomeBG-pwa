@@ -69,18 +69,29 @@ export function PlayedGameDialog(props: PlayedGameDialogProps) {
         .map(async (item) => {
           const player = item.player!;
 
-          if (typeof player === "string") {
-            // Новый игрок если не выбран а введен самостоятельно
-            const playerId = await addPlayer({ name: player.trim() });
+          if (typeof player !== "string") {
             return {
               place: item.place,
-              playerId,
+              playerId: player.id,
             };
           }
 
+          const existed = players?.find(
+            (p) => p.name.toLowerCase() === player.toLowerCase()
+          );
+
+          if (existed) {
+            return {
+              place: item.place,
+              playerId: existed.id,
+            };
+          }
+
+          // Новый игрок если не выбран а введен самостоятельно
+          const playerId = await addPlayer({ name: player.trim() });
           return {
             place: item.place,
-            playerId: player.id,
+            playerId,
           };
         });
 
@@ -90,11 +101,17 @@ export function PlayedGameDialog(props: PlayedGameDialogProps) {
       }
 
       // Новый игрок если не выбран а введен самостоятельно
+      const existedGame =
+        typeof game !== "string"
+          ? game
+          : games?.find((g) => g.name.toLowerCase() === game.toLowerCase());
 
-      const gameId =
-        typeof game === "string"
-          ? await addGame({ name: game.trim() })
-          : game.id;
+      const gameId: string =
+        existedGame?.id ||
+        (await addGame({
+          // код выше гарантирует что сейчас это строка
+          name: (game as string).trim(),
+        }));
 
       addPlayedGame({
         date: values.date,
@@ -107,7 +124,6 @@ export function PlayedGameDialog(props: PlayedGameDialogProps) {
     }
   };
 
-  console.log(result.length);
   return (
     <Dialog
       open={open}
@@ -138,8 +154,6 @@ export function PlayedGameDialog(props: PlayedGameDialogProps) {
                 onChange(val);
               }}
               freeSolo={true}
-              clearOnBlur={true}
-              autoSelect={true}
               options={games ?? []}
               loading={games === undefined}
               getOptionLabel={(val) =>
@@ -182,8 +196,6 @@ export function PlayedGameDialog(props: PlayedGameDialogProps) {
                   }}
                   fullWidth={true}
                   freeSolo={true}
-                  clearOnBlur={true}
-                  autoSelect={true}
                   options={players ?? []}
                   loading={players === undefined}
                   getOptionLabel={(val) =>
