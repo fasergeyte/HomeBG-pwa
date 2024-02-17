@@ -3,15 +3,28 @@ import { getDb } from "./database";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 
-export const getStoreGetAllQueryKey = (store: StoreName) => [
+export const getStoreGetQueryKey = (store: StoreName, id?: string) => [
   "StoreGetAllQueryKey",
   store,
+  ...(id ? [id] : []),
 ];
 
 export function useStoreGetAll<Name extends StoreName>(store: Name) {
   return useQuery({
-    queryKey: getStoreGetAllQueryKey(store),
+    queryKey: getStoreGetQueryKey(store),
     queryFn: () => getDb().then((db) => db.getAll(store)),
+  });
+}
+
+export function useStoreGet<Name extends StoreName>(
+  store: Name,
+  id: string | undefined,
+  disabled = false
+) {
+  return useQuery({
+    queryKey: getStoreGetQueryKey(store, id || "-1"),
+    queryFn: () => (id ? getDb().then((db) => db.get(store, id)) : undefined),
+    enabled: !disabled && id !== undefined,
   });
 }
 
@@ -31,7 +44,7 @@ export function useStoreAdd<Name extends StoreName>(store: Name) {
   return useMutation({
     mutationFn: async (entity: Omit<StoreValue<Name>, "id">) => {
       const result = (await getDb()).add(store, entity);
-      qc.invalidateQueries({ queryKey: getStoreGetAllQueryKey(store) });
+      qc.invalidateQueries({ queryKey: getStoreGetQueryKey(store) });
       return result;
     },
   });
@@ -43,7 +56,7 @@ export function useStorePut<Name extends StoreName>(store: Name) {
     mutationFn: async (entity: StoreValue<Name>) =>
       (await getDb()).put(store, entity),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: getStoreGetAllQueryKey(store) });
+      qc.invalidateQueries({ queryKey: getStoreGetQueryKey(store) });
     },
   });
 }
@@ -53,7 +66,7 @@ export function useStoreDelete<Name extends StoreName>(store: Name) {
   return useMutation({
     mutationFn: async (id: string) => (await getDb()).delete(store, id),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: getStoreGetAllQueryKey(store) });
+      qc.invalidateQueries({ queryKey: getStoreGetQueryKey(store) });
     },
   });
 }

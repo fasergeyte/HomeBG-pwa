@@ -1,5 +1,5 @@
 import { PlayedGame, useStoreGetAllAsMap } from "@libs/Store";
-import { Card, Chip, Stack, Typography } from "@mui/material";
+import { Card, Chip, ListItemButton, Stack, Typography } from "@mui/material";
 import { format } from "date-fns";
 import { useMemo } from "react";
 
@@ -22,22 +22,23 @@ export function PlayedGameListItem(props: PlayedGameListItemProps) {
   );
   return (
     <Card
-      key={playedGame.id}
-      sx={{ mb: 1, p: 1, mx: 1 }}
+      sx={{ p: 1, width: 1, my: 1 / 2 }}
       onClick={() => onClick?.(playedGame.id)}
     >
-      <Stack direction="column">
-        <Stack direction="row">
-          <Chip
-            sx={{ width: "80px" }}
-            label={format(playedGame?.date, "d MMM")}
-          />
-          <Typography ml={1} variant="h6">
-            {game?.name}
-          </Typography>
+      <ListItemButton>
+        <Stack direction="column">
+          <Stack direction="row">
+            <Chip
+              sx={{ width: "80px" }}
+              label={format(playedGame?.date, "d MMM")}
+            />
+            <Typography ml={1} variant="h6">
+              {game?.name}
+            </Typography>
+          </Stack>
+          <Typography variant="body1">{players.join(", ")}</Typography>
         </Stack>
-        <Typography variant="body1">{players.join(", ")}</Typography>
-      </Stack>
+      </ListItemButton>
     </Card>
   );
 }

@@ -1,4 +1,11 @@
-import { Game, Player, useStoreAdd, useStoreGetAll } from "@libs/Store";
+import {
+  Game,
+  Player,
+  useStoreAdd,
+  useStoreGet,
+  useStoreGetAll,
+  useStorePut,
+} from "@libs/Store";
 import {
   Autocomplete,
   Divider,
@@ -37,16 +44,32 @@ export interface PlayedGameDialogProps {
 export function PlayedGameDialog(props: PlayedGameDialogProps) {
   const { open, onClose, id } = props;
 
+  const { data: editedGame } = useStoreGet("playedGame", id, !id);
+
   const { data: players } = useStoreGetAll("player");
   const { data: games } = useStoreGetAll("game");
 
   const { mutateAsync: addPlayer } = useStoreAdd("player");
   const { mutateAsync: addGame } = useStoreAdd("game");
   const { mutateAsync: addPlayedGame } = useStoreAdd("playedGame");
+  const { mutateAsync: putPlayedGame } = useStorePut("playedGame");
 
-  const { control, watch, handleSubmit } = useForm<FormValues>({
+  const { control, watch, handleSubmit, reset } = useForm<FormValues>({
     defaultValues,
   });
+
+  React.useEffect(() => {
+    if (!editedGame) return;
+    reset({
+      date: editedGame.date,
+      game: games?.find((g) => g.id === editedGame.gameId),
+      result: editedGame.result.map((res) => ({
+        place: res.place,
+        player: players?.find((p) => p.id === res.playerId),
+      })),
+    });
+  }, [editedGame, games, players, reset]);
+
   const result = watch("result");
 
   const { fields, append, remove } = useFieldArray({
@@ -113,11 +136,21 @@ export function PlayedGameDialog(props: PlayedGameDialogProps) {
           name: (game as string).trim(),
         }));
 
-      addPlayedGame({
+      const toSave = {
         date: values.date,
         gameId,
         result: await Promise.all(result),
-      });
+      };
+
+      if (!editedGame) {
+        addPlayedGame(toSave);
+      } else {
+        putPlayedGame({
+          id: editedGame.id,
+          ...toSave,
+        });
+      }
+
       onClose();
     } catch (e) {
       console.error(e);
@@ -229,7 +262,7 @@ export function PlayedGameDialog(props: PlayedGameDialogProps) {
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Закрыть</Button>
-        {!id && <Button type="submit">Добавить</Button>}
+        {<Button type="submit">{id ? "Сохранить" : "Добавить"}</Button>}
       </DialogActions>
     </Dialog>
   );

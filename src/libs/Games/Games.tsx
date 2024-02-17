@@ -1,4 +1,11 @@
-import { Box, Card, Fab, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Card,
+  Fab,
+  ListItemButton,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { useStoreAdd, useStoreDelete, useStoreGetAll } from "@libs/Store";
 import AddIcon from "@mui/icons-material/Add";
 import TextField from "@mui/material/TextField";
@@ -52,8 +59,12 @@ export function Games() {
         )}
         {games?.map((game) => (
           <ContextMenu key={game.id} id={game.id} actions={actions}>
-            <Card key={game.name} sx={{ mb: 1, p: 1, mx: 1 }}>
-              <Typography variant="h6">{game.name}</Typography>
+            <Card key={game.name} sx={{ width: 1, p: 1, my: 1 / 2 }}>
+              <ListItemButton sx={{}}>
+                <Stack direction="row">
+                  <Typography variant="h6">{game.name}</Typography>
+                </Stack>
+              </ListItemButton>
             </Card>
           </ContextMenu>
         ))}

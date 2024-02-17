@@ -3,13 +3,18 @@ import { useStoreDelete, useStoreGetAll } from "@libs/Store";
 import AddIcon from "@mui/icons-material/Add";
 import { ContextMenu, ContextMenuItem } from "@libs/Common";
 import { PlayedGameListItem } from "./PlayedGameListItem";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { orderBy } from "lodash";
 import { PlayedGameDialog } from "./PlayedGameDialog";
 
 export function PlayedGames() {
   const { data: playedGames } = useStoreGetAll("playedGame");
   const { mutateAsync: deletePlayedGame } = useStoreDelete("playedGame");
 
+  const sortedGames = useMemo(
+    () => orderBy(playedGames?.sort(), ["date"], ["asc"]),
+    [playedGames]
+  );
   const [modalState, setModalState] = useState<{ id?: string; show: boolean }>({
     show: false,
   });
@@ -36,12 +41,12 @@ export function PlayedGames() {
           overflow: "scroll",
         }}
       >
-        {playedGames?.length === 0 && (
+        {sortedGames?.length === 0 && (
           <Typography variant="h6" color={"GrayText"} textAlign={"center"}>
             Список пуст
           </Typography>
         )}
-        {playedGames?.map((playedGame) => (
+        {sortedGames?.map((playedGame) => (
           <ContextMenu key={playedGame.id} id={playedGame.id} actions={actions}>
             <PlayedGameListItem onClick={onEdit} playedGame={playedGame} />
           </ContextMenu>
