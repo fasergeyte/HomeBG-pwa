@@ -29,7 +29,7 @@ export function PlayedGameListItem(props: PlayedGameListItemProps) {
       <Stack direction="column">
         <Stack direction="row">
           <Chip
-            sx={{ width: "70px" }}
+            sx={{ width: "80px" }}
             label={format(playedGame?.date, "d MMM")}
           />
           <Typography ml={1} variant="h6">

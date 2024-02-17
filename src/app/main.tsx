@@ -2,6 +2,10 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import { Box } from "@mui/material";
+import { ru } from "date-fns/locale";
+import { setDefaultOptions } from "date-fns";
+
+setDefaultOptions({ locale: ru });
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

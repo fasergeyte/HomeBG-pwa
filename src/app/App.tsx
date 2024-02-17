@@ -5,13 +5,14 @@ import { RootRouter } from "./pages/RootRouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { ru } from "date-fns/locale";
 
 const theme = createTheme();
 const queryClient = new QueryClient();
 
 function App() {
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
+    <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ru}>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
