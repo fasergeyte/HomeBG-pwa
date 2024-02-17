@@ -57,18 +57,19 @@ export function Games() {
             </Card>
           </ContextMenu>
         ))}
+        {isAdding && (
+          <Stack key="new" direction={"row"} sx={{ mb: 1, p: 1, mx: 1 / 4 }}>
+            <TextField
+              autoFocus
+              label="Имя"
+              variant="outlined"
+              sx={{ backgroundColor: "white" }}
+              fullWidth
+              onBlur={(e) => onSubmit(e.target.value)}
+            />
+          </Stack>
+        )}
       </Box>
-      {isAdding && (
-        <Stack direction={"row"}>
-          <TextField
-            autoFocus
-            label="Имя"
-            variant="outlined"
-            fullWidth
-            onBlur={(e) => onSubmit(e.target.value)}
-          />
-        </Stack>
-      )}
       {!isAdding && (
         <Fab
           onClick={onAdd}

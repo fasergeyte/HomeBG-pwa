@@ -154,6 +154,8 @@ export function PlayedGameDialog(props: PlayedGameDialogProps) {
                 onChange(val);
               }}
               freeSolo={true}
+              clearOnBlur={true}
+              autoSelect={true}
               options={games ?? []}
               loading={games === undefined}
               getOptionLabel={(val) =>
@@ -196,6 +198,8 @@ export function PlayedGameDialog(props: PlayedGameDialogProps) {
                   }}
                   fullWidth={true}
                   freeSolo={true}
+                  clearOnBlur={true}
+                  autoSelect={true}
                   options={players ?? []}
                   loading={players === undefined}
                   getOptionLabel={(val) =>
