@@ -32,7 +32,7 @@ export function Home() {
         slidesToShow={1}
         slidesToScroll={1}
         sx={(theme) => ({
-          backgroundColor: theme.palette.grey[100],
+          backgroundColor: theme.palette.grey[300],
           pt: 1,
         })}
       >

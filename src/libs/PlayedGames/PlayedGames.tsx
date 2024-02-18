@@ -1,4 +1,4 @@
-import { Box, Fab, Typography } from "@mui/material";
+import { Box, Fab, List, Typography } from "@mui/material";
 import { useStoreDelete, useStoreGetAll } from "@libs/Store";
 import AddIcon from "@mui/icons-material/Add";
 import { ContextMenu, ContextMenuItem } from "@libs/Common";
@@ -12,7 +12,7 @@ export function PlayedGames() {
   const { mutateAsync: deletePlayedGame } = useStoreDelete("playedGame");
 
   const sortedGames = useMemo(
-    () => orderBy(playedGames?.sort(), ["date"], ["asc"]),
+    () => orderBy(playedGames?.sort(), ["date"], ["desc"]),
     [playedGames]
   );
   const [modalState, setModalState] = useState<{ id?: string; show: boolean }>({
@@ -31,14 +31,17 @@ export function PlayedGames() {
 
   return (
     <Box height={"100%"} px={1} position={"relative"}>
-      <Box
+      <List
         sx={{
           position: "absolute",
           bottom: 0,
           right: 0,
           left: 0,
           top: 0,
-          overflow: "scroll",
+          px: 1,
+          py: 0,
+          overflowX: "hidden",
+          overflowY: "scroll",
         }}
       >
         {sortedGames?.length === 0 && (
@@ -51,7 +54,7 @@ export function PlayedGames() {
             <PlayedGameListItem onClick={onEdit} playedGame={playedGame} />
           </ContextMenu>
         ))}
-      </Box>
+      </List>
       <Fab
         onClick={onAdd}
         sx={{ bottom: 16, right: 16, position: "absolute" }}

@@ -1,5 +1,5 @@
 import { PlayedGame, useStoreGetAllAsMap } from "@libs/Store";
-import { Card, Chip, ListItemButton, Stack, Typography } from "@mui/material";
+import { Box, Chip, ListItemButton, Stack, Typography } from "@mui/material";
 import { format } from "date-fns";
 import { useMemo } from "react";
 
@@ -16,29 +16,56 @@ export function PlayedGameListItem(props: PlayedGameListItemProps) {
   const players = useMemo(
     () =>
       playedGame.result.map(
-        ({ place, playerId }) => `${place}. ${playersMap?.get(playerId)?.name}`
+        ({ place, playerId }) =>
+          `${place}.\u00A0${playersMap?.get(playerId)?.name}`
       ),
     [playedGame.result, playersMap]
   );
   return (
-    <Card
-      sx={{ p: 1, width: 1, my: 1 / 2 }}
-      onClick={() => onClick?.(playedGame.id)}
-    >
-      <ListItemButton>
-        <Stack direction="column">
+    <>
+      <ListItemButton
+        sx={{
+          p: 1,
+          width: 1,
+          my: 1 / 2,
+          bgcolor: "background.paper",
+        }}
+        onClick={() => onClick?.(playedGame.id)}
+      >
+        <Box
+          sx={{
+            width: "calc(100%)",
+          }}
+        >
           <Stack direction="row">
             <Chip
               sx={{ width: "80px" }}
               label={format(playedGame?.date, "d MMM")}
             />
-            <Typography ml={1} variant="h6">
+            <Typography
+              ml={1}
+              variant="h6"
+              sx={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
               {game?.name}
             </Typography>
           </Stack>
-          <Typography variant="body1">{players.join(", ")}</Typography>
-        </Stack>
+          <Typography
+            variant="body1"
+            sx={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {players.join(", ")}
+          </Typography>
+        </Box>
       </ListItemButton>
-    </Card>
+    </>
   );
 }

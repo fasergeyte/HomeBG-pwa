@@ -1,7 +1,7 @@
 import {
   Box,
-  Card,
   Fab,
+  List,
   ListItemButton,
   Stack,
   Typography,
@@ -42,14 +42,16 @@ export function Games() {
 
   return (
     <Box height={"100%"} px={1}>
-      <Box
+      <List
         sx={{
           position: "absolute",
           bottom: 0,
           right: 0,
           left: 0,
           top: 0,
-          overflow: "scroll",
+          px: 1,
+          py: 0,
+          overflowY: "scroll",
         }}
       >
         {games?.length === 0 && (
@@ -59,13 +61,27 @@ export function Games() {
         )}
         {games?.map((game) => (
           <ContextMenu key={game.id} id={game.id} actions={actions}>
-            <Card key={game.name} sx={{ width: 1, p: 1, my: 1 / 2 }}>
-              <ListItemButton sx={{}}>
-                <Stack direction="row">
-                  <Typography variant="h6">{game.name}</Typography>
-                </Stack>
-              </ListItemButton>
-            </Card>
+            <ListItemButton
+              sx={{ width: 1, p: 1, my: 1 / 2, bgcolor: "background.paper" }}
+            >
+              <Stack
+                direction="row"
+                sx={{
+                  width: "calc(100%)",
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  sx={{
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {game.name}
+                </Typography>
+              </Stack>
+            </ListItemButton>
           </ContextMenu>
         ))}
         {isAdding && (
@@ -80,7 +96,7 @@ export function Games() {
             />
           </Stack>
         )}
-      </Box>
+      </List>
       {!isAdding && (
         <Fab
           onClick={onAdd}

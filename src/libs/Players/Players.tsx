@@ -1,7 +1,7 @@
 import {
   Box,
-  Card,
   Fab,
+  List,
   ListItemButton,
   Stack,
   Typography,
@@ -42,14 +42,16 @@ export function Players() {
 
   return (
     <Box height={"100%"} px={1} position={"relative"}>
-      <Box
+      <List
         sx={{
           position: "absolute",
           bottom: 0,
           right: 0,
           left: 0,
           top: 0,
-          overflow: "scroll",
+          px: 1,
+          py: 0,
+          overflowY: "scroll",
         }}
       >
         {players?.length === 0 && (
@@ -59,13 +61,27 @@ export function Players() {
         )}
         {players?.map((player) => (
           <ContextMenu key={player.id} id={player.id} actions={actions}>
-            <Card key={player.name} sx={{ width: 1, p: 1, my: 1 / 2 }}>
-              <ListItemButton sx={{}}>
-                <Stack direction="row">
-                  <Typography variant="h6">{player.name}</Typography>
-                </Stack>
-              </ListItemButton>
-            </Card>
+            <ListItemButton
+              sx={{ width: 1, p: 1, my: 1 / 2, bgcolor: "background.paper" }}
+            >
+              <Stack
+                direction="row"
+                sx={{
+                  width: "calc(100%)",
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  sx={{
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {player.name}
+                </Typography>
+              </Stack>
+            </ListItemButton>
           </ContextMenu>
         ))}
         {isAdding && (
@@ -80,7 +96,7 @@ export function Players() {
             />
           </Stack>
         )}
-      </Box>
+      </List>
       {!isAdding && (
         <Fab
           hidden={isAdding}
