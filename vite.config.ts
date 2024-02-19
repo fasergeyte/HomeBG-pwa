@@ -19,6 +19,9 @@ export default defineConfig({
         type: "module",
       },
       registerType: "autoUpdate",
+      manifest: {
+        name: "Настолки",
+      },
     }),
     checker({
       typescript: true,

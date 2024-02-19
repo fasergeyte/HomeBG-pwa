@@ -7,7 +7,19 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { ru } from "date-fns/locale";
 
-const theme = createTheme();
+const theme = createTheme({
+  components: {
+    MuiListItemButton: {
+      styleOverrides: {
+        root: {
+          "&:hover": {
+            backgroundColor: "#fff",
+          },
+        },
+      },
+    },
+  },
+});
 const queryClient = new QueryClient();
 
 function App() {
