@@ -5,10 +5,11 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import { RootPage } from "./RootPage";
+import { paths } from "@libs/Routing";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path={import.meta.env.BASE_URL + "*"} element={<RootPage />} />
+    <Route path={paths.root.route} element={<RootPage />} />
   )
 );
 
