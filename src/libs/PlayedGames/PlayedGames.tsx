@@ -15,17 +15,17 @@ export function PlayedGames() {
     () => orderBy(playedGames?.sort(), ["date"], ["desc"]),
     [playedGames]
   );
-  const [modalState, setModalState] = useState<{ id?: string; show: boolean }>({
+  const [modalState, setModalState] = useState<{ id?: number; show: boolean }>({
     show: false,
   });
 
   const onAdd = () => setModalState({ show: true });
-  const onEdit = (id: string) => setModalState({ id, show: true });
+  const onEdit = (id: number) => setModalState({ id, show: true });
 
-  const actions: ContextMenuItem<string>[] = [
+  const actions: ContextMenuItem<number>[] = [
     {
       label: "Удалить",
-      action: (id: string) => deletePlayedGame(id),
+      action: (id) => deletePlayedGame(id),
     },
   ];
 

@@ -3,7 +3,7 @@ import { getDb } from "./database";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 
-export const getStoreGetQueryKey = (store: StoreName, id?: string) => [
+export const getStoreGetQueryKey = (store: StoreName, id?: number) => [
   "StoreGetAllQueryKey",
   store,
   ...(id ? [id] : []),
@@ -18,11 +18,11 @@ export function useStoreGetAll<Name extends StoreName>(store: Name) {
 
 export function useStoreGet<Name extends StoreName>(
   store: Name,
-  id: string | undefined,
+  id: number | undefined,
   disabled = false
 ) {
   return useQuery({
-    queryKey: getStoreGetQueryKey(store, id || "-1"),
+    queryKey: getStoreGetQueryKey(store, id || -1),
     queryFn: () => (id ? getDb().then((db) => db.get(store, id)) : undefined),
     enabled: !disabled && id !== undefined,
   });
@@ -31,7 +31,7 @@ export function useStoreGet<Name extends StoreName>(
 export function useStoreGetAllAsMap<Name extends StoreName>(store: Name) {
   const { data: list } = useStoreGetAll(store);
 
-  const map: ReadonlyMap<string, StoreValue<Name>> | undefined = useMemo(() => {
+  const map: ReadonlyMap<number, StoreValue<Name>> | undefined = useMemo(() => {
     if (!list) return;
 
     return new Map(list?.map((item) => [item.id, item]));
@@ -64,7 +64,7 @@ export function useStorePut<Name extends StoreName>(store: Name) {
 export function useStoreDelete<Name extends StoreName>(store: Name) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (id: string) => (await getDb()).delete(store, id),
+    mutationFn: async (id: number) => (await getDb()).delete(store, id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: getStoreGetQueryKey(store) });
     },

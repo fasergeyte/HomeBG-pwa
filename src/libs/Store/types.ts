@@ -2,36 +2,36 @@ import * as idb from "idb";
 
 export interface Player {
   name: string;
-  id: string;
+  id: number;
 }
 
 export interface Game {
   name: string;
-  id: string;
+  id: number;
 }
 
 export interface PlayedGame {
-  id: string;
+  id: number;
   date: Date;
-  result: { place: number; playerId: string }[];
-  gameId: string;
+  result: { place: number; playerId: number }[];
+  gameId: number;
 }
 
 export interface BgDbSchema extends idb.DBSchema {
   player: {
     value: Player;
-    key: string;
-    indexes: { id: string; name: string };
+    key: number;
+    indexes: { id: number; name: string };
   };
   game: {
     value: Game;
-    key: string;
-    indexes: { id: string; name: string };
+    key: number;
+    indexes: { id: number; name: string };
   };
   playedGame: {
     value: PlayedGame;
-    key: string;
-    indexes: { id: string; date: string; gameId: string };
+    key: number;
+    indexes: { id: number; date: string; gameId: number };
   };
 }
 

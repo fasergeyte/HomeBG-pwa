@@ -33,10 +33,10 @@ export function Players() {
 
   const onAdd = () => setIsAdding(true);
 
-  const actions: ContextMenuItem<string>[] = [
+  const actions: ContextMenuItem<number>[] = [
     {
       label: "Удалить",
-      action: (id: string) => deletePlayer(id),
+      action: (id) => deletePlayer(id),
     },
   ];
 

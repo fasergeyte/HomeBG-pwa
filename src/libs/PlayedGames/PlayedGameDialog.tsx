@@ -38,7 +38,7 @@ const defaultValues: Partial<FormValues> = {
 export interface PlayedGameDialogProps {
   open: boolean;
   onClose: () => void;
-  id?: string;
+  id?: number;
 }
 
 export function PlayedGameDialog(props: PlayedGameDialogProps) {
@@ -129,7 +129,7 @@ export function PlayedGameDialog(props: PlayedGameDialogProps) {
           ? game
           : games?.find((g) => g.name.toLowerCase() === game.toLowerCase());
 
-      const gameId: string =
+      const gameId: number =
         existedGame?.id ||
         (await addGame({
           // код выше гарантирует что сейчас это строка
