@@ -8,7 +8,7 @@ import { RootPage } from "./RootPage";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path={import.meta.env.BASE_URL} element={<RootPage />} />
+    <Route path={import.meta.env.BASE_URL + "*"} element={<RootPage />} />
   )
 );
 

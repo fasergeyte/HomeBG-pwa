@@ -23,6 +23,8 @@ import { useForm, Controller, useFieldArray } from "react-hook-form";
 import * as React from "react";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useNavigate, useParams } from "react-router-dom";
+import { UrlParams } from "@libs/Routing/paths";
 
 interface FormValues {
   date: Date;
@@ -35,15 +37,9 @@ const defaultValues: Partial<FormValues> = {
   result: [{ place: 1, player: null }],
 };
 
-export interface PlayedGameDialogProps {
-  open: boolean;
-  onClose: () => void;
-  id?: number;
-}
-
-export function PlayedGameDialog(props: PlayedGameDialogProps) {
-  const { open, onClose, id } = props;
-
+export function PlayedGameDialog() {
+  const params = useParams<UrlParams<"playedGameDialog">>();
+  const id = params.id === undefined ? undefined : Number(params.id);
   const { data: editedGame } = useStoreGet("playedGame", id, !id);
 
   const { data: players } = useStoreGetAll("player");
@@ -53,6 +49,8 @@ export function PlayedGameDialog(props: PlayedGameDialogProps) {
   const { mutateAsync: addGame } = useStoreAdd("game");
   const { mutateAsync: addPlayedGame } = useStoreAdd("playedGame");
   const { mutateAsync: putPlayedGame } = useStorePut("playedGame");
+
+  const navigate = useNavigate();
 
   const { control, watch, handleSubmit, reset } = useForm<FormValues>({
     defaultValues,
@@ -151,7 +149,7 @@ export function PlayedGameDialog(props: PlayedGameDialogProps) {
         });
       }
 
-      onClose();
+      navigate("..");
     } catch (e) {
       console.error(e);
     }
@@ -159,8 +157,8 @@ export function PlayedGameDialog(props: PlayedGameDialogProps) {
 
   return (
     <Dialog
-      open={open}
-      onClose={onClose}
+      open={true}
+      onClose={() => navigate("..")}
       PaperProps={{
         component: "form",
         onSubmit: handleSubmit(onSubmit),
@@ -261,8 +259,8 @@ export function PlayedGameDialog(props: PlayedGameDialogProps) {
         ))}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Закрыть</Button>
-        {<Button type="submit">{id ? "Сохранить" : "Добавить"}</Button>}
+        <Button onClick={() => navigate("..")}>Закрыть</Button>
+        <Button type="submit">{id ? "Сохранить" : "Добавить"}</Button>
       </DialogActions>
     </Dialog>
   );

@@ -3,24 +3,25 @@ import { useStoreDelete, useStoreGetAll } from "@libs/Store";
 import AddIcon from "@mui/icons-material/Add";
 import { ContextMenu, ContextMenuItem } from "@libs/Common";
 import { PlayedGameListItem } from "./PlayedGameListItem";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { orderBy } from "lodash";
-import { PlayedGameDialog } from "./PlayedGameDialog";
+import { useNavigate } from "react-router-dom";
+import { paths } from "@libs/Routing/paths";
+import { PlayedGamesRouter } from "./PlayedGamesRouter";
 
 export function PlayedGames() {
   const { data: playedGames } = useStoreGetAll("playedGame");
   const { mutateAsync: deletePlayedGame } = useStoreDelete("playedGame");
 
+  const navigate = useNavigate();
   const sortedGames = useMemo(
     () => orderBy(playedGames?.sort(), ["date"], ["desc"]),
     [playedGames]
   );
-  const [modalState, setModalState] = useState<{ id?: number; show: boolean }>({
-    show: false,
-  });
 
-  const onAdd = () => setModalState({ show: true });
-  const onEdit = (id: number) => setModalState({ id, show: true });
+  const onAdd = () => navigate(paths.playedGameDialog.getUrl());
+  const onEdit = (id: number) =>
+    navigate(paths.playedGameDialog.getUrl({ id }));
 
   const actions: ContextMenuItem<number>[] = [
     {
@@ -31,6 +32,7 @@ export function PlayedGames() {
 
   return (
     <Box height={"100%"} px={1} position={"relative"}>
+      <PlayedGamesRouter />
       <List
         sx={{
           position: "absolute",
@@ -62,13 +64,6 @@ export function PlayedGames() {
       >
         <AddIcon />
       </Fab>
-      {modalState.show && (
-        <PlayedGameDialog
-          id={modalState.id}
-          open={modalState.show}
-          onClose={() => setModalState({ show: false })}
-        />
-      )}
     </Box>
   );
 }
