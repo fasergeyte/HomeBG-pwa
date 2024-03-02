@@ -15,7 +15,7 @@ export const paths = {
     getUrl: () => `${basePath}/home`,
   },
   playerStats: {
-    route: `${basePath}stats/player/:id`,
+    route: `${basePath}/stats/player/:id`,
     getUrl: (params?: { id: string | number }) =>
       `${basePath}/stats/player/${params?.id}`,
   },
