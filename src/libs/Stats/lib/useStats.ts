@@ -22,8 +22,8 @@ export function useStats(playerId: number | undefined) {
           if (!result) return stats;
 
           const gameStats =
-            stats.gamesStats[g.id] ??
-            (stats.gamesStats[g.id] = { total: 0, wins: 0, defeats: 0 });
+            stats.gamesStats[g.gameId] ??
+            (stats.gamesStats[g.gameId] = { total: 0, wins: 0, defeats: 0 });
 
           const totalStats = stats.total;
 

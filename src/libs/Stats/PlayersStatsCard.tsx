@@ -39,7 +39,9 @@ export function PlayersStatsCard(props: PlayersStatsCardProps) {
             </TableRow>
             <TableRow>
               <TableCell>Винрейт</TableCell>
-              <TableCell>{(wins / total) * 100}%</TableCell>
+              <TableCell>
+                {total ? `${Math.round((wins / total) * 100)}%` : "-"}
+              </TableCell>
             </TableRow>
           </TableBody>
         </Table>
