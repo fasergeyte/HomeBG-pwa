@@ -79,7 +79,10 @@ export function PlayedGameDialog() {
 
   React.useEffect(() => {
     if (lastPlayer || result.length === 0) {
-      append({ place: result.length + 1, player: null });
+      append(
+        { place: result.length + 1, player: null },
+        { shouldFocus: false }
+      );
     }
   }, [append, result, lastPlayer]);
 
@@ -149,7 +152,7 @@ export function PlayedGameDialog() {
         });
       }
 
-      navigate("..");
+      navigate("..", { replace: true });
     } catch (e) {
       console.error(e);
     }
@@ -158,7 +161,7 @@ export function PlayedGameDialog() {
   return (
     <Dialog
       open={true}
-      onClose={() => navigate("..")}
+      onClose={() => navigate("..", { replace: true })}
       PaperProps={{
         component: "form",
         onSubmit: handleSubmit(onSubmit),
@@ -205,7 +208,6 @@ export function PlayedGameDialog() {
               control={control}
               render={({ field }) => (
                 <TextField
-                  autoFocus={false}
                   inputProps={field}
                   type="number"
                   sx={{
