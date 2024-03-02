@@ -21,6 +21,7 @@ export default defineConfig({
       registerType: "autoUpdate",
       manifest: {
         name: "Настолки",
+        theme_color: "#1976d2",
       },
     }),
     checker({

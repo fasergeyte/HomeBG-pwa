@@ -31,8 +31,8 @@ export function Home() {
         afterChange={(index) => setActiveTab(index)}
         slidesToShow={1}
         slidesToScroll={1}
-        sx={(theme) => ({
-          backgroundColor: theme.palette.grey[300],
+        sx={() => ({
+          backgroundColor: "background.level0",
           pt: 1,
         })}
       >

@@ -1,18 +1,19 @@
-import {
-  Route,
-  createRoutesFromElements,
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
-import { RootPage } from "./RootPage";
+import { Route, BrowserRouter, Routes, Navigate } from "react-router-dom";
+import { HomePage } from "./HomePage";
 import { paths } from "@libs/Routing";
-
-const router = createBrowserRouter(
-  createRoutesFromElements(
-    <Route path={paths.root.route} element={<RootPage />} />
-  )
-);
+import { StatsPage } from "./StatsPage";
 
 export function RootRouter() {
-  return <RouterProvider router={router} />;
+  return (
+    <BrowserRouter basename={paths.root.getUrl()}>
+      <Routes>
+        <Route path={paths.home.route} element={<HomePage />} />
+        <Route path={paths.playerStats.route} element={<StatsPage />} />
+        <Route
+          path="/"
+          element={<Navigate to={paths.home.getUrl()} replace={true} />}
+        />
+      </Routes>
+    </BrowserRouter>
+  );
 }

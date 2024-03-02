@@ -1,14 +1,23 @@
-const base = (import.meta.env.BASE_URL + "/").replace(/\/\/$/, "/");
+const basePath = import.meta.env.BASE_URL.replace(/\/*$/, "");
 
 export const paths = {
   playedGameDialog: {
     route: `/playedGame/:id?`,
     getUrl: (params?: { id?: string | number }) =>
-      `${base}playedGame/${params?.id ?? ""}`,
+      `${basePath}/playedGame/${params?.id ?? ""}`,
   },
   root: {
-    route: `${base}*`,
-    getUrl: () => `${base}`,
+    route: `${basePath}/*`,
+    getUrl: () => basePath,
+  },
+  home: {
+    route: `${basePath}/home/*`,
+    getUrl: () => `${basePath}/home`,
+  },
+  playerStats: {
+    route: `${basePath}stats/player/:id`,
+    getUrl: (params?: { id: string | number }) =>
+      `${basePath}/stats/player/${params?.id}`,
   },
 } as const;
 

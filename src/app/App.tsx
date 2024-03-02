@@ -1,4 +1,4 @@
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import "./App.css";
 import CssBaseline from "@mui/material/CssBaseline";
 import { RootRouter } from "./pages/RootRouter";
@@ -6,21 +6,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { ru } from "date-fns/locale";
+import { createAppTheme } from "./lib/createAppTheme";
 
-const theme = createTheme({
-  components: {
-    MuiListItemButton: {
-      styleOverrides: {
-        root: {
-          "&:hover": {
-            backgroundColor: "#fff",
-          },
-        },
-      },
-    },
-  },
-});
 const queryClient = new QueryClient();
+
+const theme = createAppTheme();
 
 function App() {
   return (

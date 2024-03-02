@@ -11,9 +11,14 @@ import AddIcon from "@mui/icons-material/Add";
 import TextField from "@mui/material/TextField";
 import { useState } from "react";
 import { ContextMenu, ContextMenuItem } from "@libs/Common";
+import { paths } from "@libs/Routing";
+import { useNavigate } from "react-router-dom";
 
 export function Players() {
+  const navigate = useNavigate();
+
   const { data: players } = useStoreGetAll("player");
+
   const { mutateAsync: addPlayer } = useStoreAdd("player");
   const { mutateAsync: deletePlayer } = useStoreDelete("player");
 
@@ -62,6 +67,9 @@ export function Players() {
         {players?.map((player) => (
           <ContextMenu key={player.id} id={player.id} actions={actions}>
             <ListItemButton
+              onClick={() =>
+                navigate(paths.playerStats.getUrl({ id: player.id }))
+              }
               sx={{ width: 1, p: 1, my: 1 / 2, bgcolor: "background.paper" }}
             >
               <Stack
