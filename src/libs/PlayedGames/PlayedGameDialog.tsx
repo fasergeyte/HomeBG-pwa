@@ -161,7 +161,7 @@ export function PlayedGameDialog() {
   return (
     <Dialog
       open={true}
-      onClose={() => navigate("..", { replace: true })}
+      onClose={() => navigate(-1)}
       PaperProps={{
         component: "form",
         onSubmit: handleSubmit(onSubmit),
@@ -261,7 +261,7 @@ export function PlayedGameDialog() {
         ))}
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => navigate("..")}>Закрыть</Button>
+        <Button onClick={() => navigate(-1)}>Закрыть</Button>
         <Button type="submit">{id ? "Сохранить" : "Добавить"}</Button>
       </DialogActions>
     </Dialog>

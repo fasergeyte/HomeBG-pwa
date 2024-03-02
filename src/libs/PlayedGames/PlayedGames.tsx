@@ -15,7 +15,7 @@ export function PlayedGames() {
 
   const navigate = useNavigate();
   const sortedGames = useMemo(
-    () => orderBy(playedGames?.sort(), ["date"], ["desc"]),
+    () => orderBy(playedGames?.sort(), ["date", "id"], ["desc", "desc"]),
     [playedGames]
   );
 
