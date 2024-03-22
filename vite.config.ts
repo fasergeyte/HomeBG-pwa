@@ -23,6 +23,17 @@ export default defineConfig({
         name: "Настолки",
         theme_color: "#1976d2",
       },
+      workbox: {
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.origin === "https://apis.google.com",
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "api-cache",
+            },
+          },
+        ],
+      },
     }),
     checker({
       typescript: true,

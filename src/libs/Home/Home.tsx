@@ -1,45 +1,61 @@
-import Tab from "@mui/material/Tab";
-import { useRef, useState } from "react";
-import { Stack, Tabs } from "@mui/material";
+import {
+  BottomNavigation,
+  BottomNavigationAction,
+  Box,
+  Stack,
+} from "@mui/material";
 import { Games } from "@libs/Games";
-import { Slider } from "@libs/Common";
 import { PlayedGames } from "@libs/PlayedGames";
 import { Players } from "@libs/Players";
+import AccessibilityNewIcon from "@mui/icons-material/AccessibilityNew";
+import CasinoIcon from "@mui/icons-material/Casino";
+import Diversity3Icon from "@mui/icons-material/Diversity3";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { HomeSection, UrlParams, paths } from "@libs/Routing";
 
 export function Home() {
-  const [activeTab, setActiveTab] = useState<number>(1);
+  const navigate = useNavigate();
+  const { section } = useParams<UrlParams<"home">>();
 
-  const sliderRef = useRef<Slider | null>();
+  if (!section) return <Navigate to={paths.home.getUrl()} />;
+
   return (
     <Stack height={1}>
-      <Tabs
-        variant="fullWidth"
-        value={activeTab}
-        onChange={(e, value) => sliderRef.current?.slickGoTo(value)}
-      >
-        <Tab value={0} label="Игры" />
-        <Tab value={1} label="Партии" />
-        <Tab value={2} label="Игроки" />
-      </Tabs>
-      <Slider
-        infinite={false}
-        arrows={false}
-        initialSlide={1}
-        ref={(c) => {
-          sliderRef.current = c;
-        }}
-        afterChange={(index) => setActiveTab(index)}
-        slidesToShow={1}
-        slidesToScroll={1}
-        sx={() => ({
+      <Box
+        sx={{
           backgroundColor: "background.level0",
           pt: 1,
-        })}
+          height: "100%",
+          position: "relative",
+        }}
       >
-        <Games />
-        <PlayedGames />
-        <Players />
-      </Slider>
+        {HomeSection.Games === section && <Games />}
+        {HomeSection.Players === section && <Players />}
+        {HomeSection.PlayedGames === section && <PlayedGames />}
+      </Box>
+      <BottomNavigation
+        showLabels
+        value={section}
+        onChange={(event, section) => {
+          navigate(paths.home.getUrl({ section }));
+        }}
+      >
+        <BottomNavigationAction
+          value={HomeSection.Games}
+          label="Игры"
+          icon={<CasinoIcon />}
+        />
+        <BottomNavigationAction
+          value={HomeSection.PlayedGames}
+          label="Партии"
+          icon={<Diversity3Icon />}
+        />
+        <BottomNavigationAction
+          value={HomeSection.Players}
+          label="Игроки"
+          icon={<AccessibilityNewIcon />}
+        />
+      </BottomNavigation>
     </Stack>
   );
 }
