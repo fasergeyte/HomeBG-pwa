@@ -8,16 +8,16 @@ export enum HomeSection {
 
 export const paths = {
   playedGameDialog: {
-    route: `playedGame/:id?`,
+    route: `playedGameDlg/:id?`,
     getUrl: (params?: { id?: string | number }) =>
-      `playedGame/${params?.id ?? ""}`,
+      `playedGameDlg/${params?.id ?? ""}`,
   },
   root: {
     route: `${basePath}/*`,
     getUrl: () => basePath,
   },
   home: {
-    route: `${basePath}/home/:section?`,
+    route: `${basePath}/home/:section?/*`,
     getUrl: (params?: { section?: HomeSection }) =>
       `${basePath}/home/${params?.section ?? HomeSection.PlayedGames}`,
   },

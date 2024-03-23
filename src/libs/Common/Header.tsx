@@ -11,6 +11,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useState } from "react";
+import { GoogleSyncServiceInst } from "@libs/GoogleSync";
 
 interface HeaderProps {
   title: string;
@@ -62,7 +63,13 @@ export function Header(props: HeaderProps) {
         }}
       >
         <MenuList>
-          <MenuItem onClick={() => {}}>Синхронизация</MenuItem>
+          <MenuItem
+            onClick={() => {
+              GoogleSyncServiceInst.createSheet();
+            }}
+          >
+            Синхронизация
+          </MenuItem>
         </MenuList>
       </Drawer>
     </>

@@ -10,5 +10,4 @@ Try to dev:
 2. npm run dev
 
 # TODO
-
-Tasks are in file: /tasks.md
+- Tasks are in file: /tasks.md
