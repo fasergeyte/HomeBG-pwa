@@ -25,6 +25,7 @@ import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useNavigate, useParams } from "react-router-dom";
 import { UrlParams } from "@libs/Routing/paths";
+import { v4 as uuid } from "uuid";
 
 interface FormValues {
   date: Date;
@@ -138,6 +139,7 @@ export function PlayedGameDialog() {
         }));
 
       const toSave = {
+        id: editedGame?.id ?? uuid(),
         date: values.date,
         gameId,
         result: await Promise.all(result),
@@ -146,10 +148,7 @@ export function PlayedGameDialog() {
       if (!editedGame) {
         addPlayedGame(toSave);
       } else {
-        putPlayedGame({
-          id: editedGame.id,
-          ...toSave,
-        });
+        putPlayedGame(toSave);
       }
 
       navigate("..", { replace: true });
@@ -226,7 +225,6 @@ export function PlayedGameDialog() {
               render={({ field: { onChange, ...props } }) => (
                 <Autocomplete
                   onChange={(e, val) => {
-                    console.log(val);
                     onChange(val);
                   }}
                   fullWidth={true}

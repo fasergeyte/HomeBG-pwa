@@ -1,7 +1,6 @@
-import { IDBPObjectStore } from "idb";
-import { BgDbSchema, Game, Player, StoreName } from ".";
+import { Game, Player } from ".";
 
-const players: Player[] = [
+export const players: Player[] = [
   {
     name: "Наташа",
   },
@@ -13,7 +12,7 @@ const players: Player[] = [
   },
 ] as Player[];
 
-const games: Game[] = [
+export const games: Game[] = [
   {
     name: "Колонизаторы",
   },
@@ -63,22 +62,3 @@ const games: Game[] = [
     name: "21Каркасон2",
   },
 ] as Game[];
-
-export function fillMockData(
-  playerStore: IDBPObjectStore<
-    BgDbSchema,
-    ArrayLike<StoreName>,
-    "player",
-    "versionchange"
-  >,
-  gameStore: IDBPObjectStore<
-    BgDbSchema,
-    ArrayLike<StoreName>,
-    "game",
-    "versionchange"
-  >
-) {
-  if (process.env.NODE_ENV === "production") return;
-  players.forEach((player) => playerStore.add(player as Player));
-  games.forEach((game) => gameStore.add(game as Game));
-}

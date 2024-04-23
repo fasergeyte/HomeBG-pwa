@@ -31,11 +31,12 @@ export function useStoreGet<Name extends StoreName>(
 export function useStoreGetAllAsMap<Name extends StoreName>(store: Name) {
   const { data: list } = useStoreGetAll(store);
 
-  const map: ReadonlyMap<number, StoreValue<Name>> | undefined = useMemo(() => {
-    if (!list) return;
+  const map: ReadonlyMap<StoreValue<Name>["id"], StoreValue<Name>> | undefined =
+    useMemo(() => {
+      if (!list) return;
 
-    return new Map(list?.map((item) => [item.id, item]));
-  }, [list]);
+      return new Map(list?.map((item) => [item.id, item]));
+    }, [list]);
   return { map };
 }
 
@@ -64,7 +65,8 @@ export function useStorePut<Name extends StoreName>(store: Name) {
 export function useStoreDelete<Name extends StoreName>(store: Name) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (id: number) => (await getDb()).delete(store, id),
+    mutationFn: async (id: StoreValue<Name>["id"]) =>
+      (await getDb()).delete(store, id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: getStoreGetQueryKey(store) });
     },

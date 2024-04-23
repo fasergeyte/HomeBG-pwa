@@ -20,10 +20,10 @@ export function PlayedGames() {
   );
 
   const onAdd = () => navigate(paths.playedGameDialog.getUrl());
-  const onEdit = (id: number) =>
+  const onEdit = (id: string) =>
     navigate(paths.playedGameDialog.getUrl({ id }));
 
-  const actions: ContextMenuItem<number>[] = [
+  const actions: ContextMenuItem<string>[] = [
     {
       label: "Удалить",
       action: (id) => deletePlayedGame(id),

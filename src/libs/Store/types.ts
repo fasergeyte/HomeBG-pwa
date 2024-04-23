@@ -11,7 +11,7 @@ export interface Game {
 }
 
 export interface PlayedGame {
-  id: number;
+  id: string;
   date: Date;
   result: { place: number; playerId: number }[];
   gameId: number;
@@ -30,8 +30,8 @@ export interface BgDbSchema extends idb.DBSchema {
   };
   playedGame: {
     value: PlayedGame;
-    key: number;
-    indexes: { id: number; date: string; gameId: number };
+    key: string;
+    indexes: { id: string; date: string; gameId: number };
   };
 }
 

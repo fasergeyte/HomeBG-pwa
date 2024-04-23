@@ -5,7 +5,7 @@ import { useMemo } from "react";
 
 interface PlayedGameListItemProps {
   playedGame: PlayedGame;
-  onClick?: (id: number) => void;
+  onClick?: (id: string) => void;
 }
 
 export function PlayedGameListItem(props: PlayedGameListItemProps) {
