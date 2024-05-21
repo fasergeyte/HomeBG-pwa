@@ -1,5 +1,6 @@
 import {
   Game,
+  PlayedGame,
   Player,
   useStoreAdd,
   useStoreGet,
@@ -138,11 +139,12 @@ export function PlayedGameDialog() {
           name: (game as string).trim(),
         }));
 
-      const toSave = {
+      const toSave: PlayedGame = {
         id: editedGame?.id ?? uuid(),
         date: values.date,
         gameId,
         result: await Promise.all(result),
+        modifiedAt: new Date(),
       };
 
       if (!editedGame) {

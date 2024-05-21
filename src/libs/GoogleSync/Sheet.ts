@@ -1,5 +1,6 @@
+import { isNil, isNumber, isString } from "lodash";
 import { CellData, RowData } from "./types";
-export type Table = string[][];
+export type Table = (string | number | undefined | null)[][];
 
 export class Sheet {
   constructor(readonly spreadsheetId: string, readonly sheetId: number) {}
@@ -8,9 +9,33 @@ export class Sheet {
     const rows: RowData[] = data.map<RowData>((row) => {
       return {
         values: row.map<CellData>((value) => {
+          if (isNil(value)) {
+            return {
+              userEnteredValue: {
+                stringValue: "",
+              },
+            };
+          }
+
+          if (isString(value)) {
+            return {
+              userEnteredValue: {
+                stringValue: value,
+              },
+            };
+          }
+
+          if (isNumber(value)) {
+            return {
+              userEnteredValue: {
+                numberValue: value,
+              },
+            };
+          }
+
           return {
             userEnteredValue: {
-              stringValue: value,
+              stringValue: String(value),
             },
           };
         }),

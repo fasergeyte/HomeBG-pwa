@@ -93,4 +93,28 @@ const migrations = [
       await txn.done;
     },
   },
+  {
+    /**
+     * Добавляем
+     * modifiedAt в партии
+     */
+    version: 3,
+    data: async (db: DataBase) => {
+      const oldData = await db.getAll("playedGame");
+      const txn = db.transaction("playedGame", "readwrite");
+
+      oldData.forEach((d) => {
+        if (!txn.store) {
+          throw new Error("Store 'playedGame' is not found");
+        }
+
+        txn.store.put({
+          ...d,
+          modifiedAt: d.date,
+        });
+      });
+
+      await txn.done;
+    },
+  },
 ];

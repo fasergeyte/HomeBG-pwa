@@ -1,4 +1,4 @@
 export const config = {
   dbName: "bg-db",
-  dbVersion: 2,
+  dbVersion: 3,
 };

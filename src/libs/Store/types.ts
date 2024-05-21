@@ -12,7 +12,10 @@ export interface Game {
 
 export interface PlayedGame {
   id: string;
+  /** Дата партии */
   date: Date;
+  /** Изменена */
+  modifiedAt: Date;
   result: { place: number; playerId: number }[];
   gameId: number;
 }
