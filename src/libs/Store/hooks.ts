@@ -3,7 +3,7 @@ import { getDb } from "./database";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 
-export const getStoreGetQueryKey = (store: StoreName, id?: number) => [
+export const getStoreGetQueryKey = (store: StoreName, id?: string) => [
   "StoreGetAllQueryKey",
   store,
   ...(id ? [id] : []),
@@ -18,11 +18,11 @@ export function useStoreGetAll<Name extends StoreName>(store: Name) {
 
 export function useStoreGet<Name extends StoreName>(
   store: Name,
-  id: number | undefined,
+  id: string | undefined,
   disabled = false
 ) {
   return useQuery({
-    queryKey: getStoreGetQueryKey(store, id || -1),
+    queryKey: getStoreGetQueryKey(store, id),
     queryFn: () => (id ? getDb().then((db) => db.get(store, id)) : undefined),
     enabled: !disabled && id !== undefined,
   });

@@ -40,7 +40,7 @@ const defaultValues: Partial<FormValues> = {
 
 export function PlayedGameDialog() {
   const params = useParams<UrlParams<"playedGameDialog">>();
-  const id = params.id === undefined ? undefined : Number(params.id);
+  const id = params.id === undefined ? undefined : params.id;
   const { data: editedGame } = useStoreGet("playedGame", id, !id);
 
   const { data: players } = useStoreGetAll("player");
