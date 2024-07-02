@@ -30,7 +30,7 @@ export async function getDb() {
     for (const m of migrations) {
       if (m.version <= oldVersion || m.version > newVersion) continue;
 
-      await m.data(db);
+      await m.data?.(db);
     }
   }
 
@@ -115,6 +115,21 @@ const migrations = [
       });
 
       await txn.done;
+    },
+  },
+  {
+    /**
+     * Добавляем группы
+     */
+    version: 4,
+    structure: (db: DataBase) => {
+      const group = db.createObjectStore("group", {
+        keyPath: "id",
+        autoIncrement: true,
+      });
+
+      group.createIndex("documentId", "documentId", { unique: true });
+      group.createIndex("name", "name", { unique: true });
     },
   },
 ];

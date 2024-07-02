@@ -1,5 +1,12 @@
 import * as idb from "idb";
 
+export interface Group {
+  id: number;
+  name: string;
+  documentName?: string;
+  documentId?: string;
+}
+
 export interface Player {
   name: string;
   id: number;
@@ -18,6 +25,7 @@ export interface PlayedGame {
   modifiedAt: Date;
   result: { place: number; playerId: number }[];
   gameId: number;
+  groupsIds?: number[];
 }
 
 export interface BgDbSchema extends idb.DBSchema {
@@ -35,6 +43,16 @@ export interface BgDbSchema extends idb.DBSchema {
     value: PlayedGame;
     key: string;
     indexes: { id: string; date: string; gameId: number };
+  };
+  group: {
+    value: Group;
+    key: number;
+    indexes: {
+      id: number;
+      name: number;
+      documentName: string;
+      documentId: string;
+    };
   };
 }
 
