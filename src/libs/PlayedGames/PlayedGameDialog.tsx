@@ -7,12 +7,7 @@ import {
   useStoreGetAll,
   useStorePut,
 } from "@libs/Store";
-import {
-  Divider,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Divider, Stack, TextField, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -209,6 +204,7 @@ export function PlayedGameDialog() {
               control={control}
               render={({ field }) => (
                 <TextField
+                  size="small"
                   inputProps={field}
                   type="number"
                   sx={{
@@ -216,6 +212,9 @@ export function PlayedGameDialog() {
                     "& .MuiInputBase-root": {
                       borderBottomRightRadius: 0,
                       borderTopRightRadius: 0,
+                      borderBottomLeftRadius:
+                        fields.length - 1 === index ? 4 : 0,
+                      borderTopLeftRadius: 0 === index ? 4 : 0,
                     },
                   }}
                 />
@@ -241,11 +240,15 @@ export function PlayedGameDialog() {
                   renderInput={(params) => (
                     <TextField
                       {...params}
+                      size="small"
                       placeholder="игрок"
                       sx={{
                         "& .MuiInputBase-root": {
                           borderBottomLeftRadius: 0,
                           borderTopLeftRadius: 0,
+                          borderBottomRightRadius:
+                            fields.length - 1 === index ? 4 : 0,
+                          borderTopRightRadius: 0 === index ? 4 : 0,
                         },
                       }}
                     />
