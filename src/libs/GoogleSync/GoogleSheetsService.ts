@@ -1,5 +1,5 @@
-import { error } from "@libs/Common";
-import { Sheet } from "./Sheet";
+import { CellData, RowData, Table } from "./types";
+import { isNil, isNumber, isString } from "lodash";
 
 /// https://github.com/anvaka/time/blob/d016fe1f79c8c458f7e7c8cbe22cef6a89db7e57/src/lib/goog.js#L115
 const CLIENT_ID =
@@ -69,45 +69,104 @@ export class GoogleSheetsService {
     return await this.initPromise;
   }
 
-  public async createSheet(
+  public async createSpreadsheet(
     spreadSheetTitle: string,
-    sheetTitle: string
-  ): Promise<Sheet | undefined> {
-    try {
-      const response = await gapi.client.sheets.spreadsheets.create({
-        resource: {
-          properties: {
-            title: spreadSheetTitle,
-          },
-          sheets: [
-            {
-              properties: {
-                title: sheetTitle,
-              },
-            },
-          ],
+    sheetTitles: string[] = []
+  ): Promise<gapi.client.sheets.Spreadsheet> {
+    const response = await gapi.client.sheets.spreadsheets.create({
+      resource: {
+        properties: {
+          title: spreadSheetTitle,
         },
-      });
-      return response.result.sheets
-        ?.map((s) => {
-          const spreadsheetId = response.result.spreadsheetId;
-          const sheetId = s.properties?.sheetId;
+        sheets: sheetTitles.map((title) => ({
+          properties: {
+            title,
+          },
+        })),
+      },
+    });
 
-          if (!spreadsheetId || !sheetId) {
-            error(
-              `Create sheet response doesn't contains required data: 
-  response.result.spreadsheetId: ${response.result.spreadsheetId}
-  response.result.sheets[].properties.sheetId: ${s.properties?.sheetId}`
-            );
-            return;
+    return response.result;
+  }
+
+  public async get(
+    documentId: string
+  ): Promise<gapi.client.sheets.Spreadsheet> {
+    const data = await gapi.client.sheets.spreadsheets.get({
+      spreadsheetId: documentId,
+    });
+    return data.result;
+  }
+
+  public async writeData(
+    spreadsheetId: string,
+    sheetId: number,
+    col: number,
+    row: number,
+    data: Table
+  ) {
+    const rows: RowData[] = data.map<RowData>((row) => {
+      return {
+        values: row.map<CellData>((value) => {
+          if (isNil(value)) {
+            return {
+              userEnteredValue: {
+                stringValue: "",
+              },
+            };
           }
 
-          return new Sheet(spreadsheetId, sheetId);
-        })
-        .at(0);
-    } catch (e) {
-      alert(JSON.stringify(e));
-      return;
-    }
+          if (isString(value)) {
+            return {
+              userEnteredValue: {
+                stringValue: value,
+              },
+            };
+          }
+
+          if (isNumber(value)) {
+            return {
+              userEnteredValue: {
+                numberValue: value,
+              },
+            };
+          }
+
+          return {
+            userEnteredValue: {
+              stringValue: String(value),
+            },
+          };
+        }),
+      };
+    });
+
+    return gapi.client.sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      resource: {
+        requests: [
+          {
+            updateCells: {
+              range: {
+                sheetId,
+                startColumnIndex: col,
+                startRowIndex: row,
+              },
+              rows,
+              fields: "userEnteredValue.stringValue",
+            },
+          },
+        ],
+      },
+    });
+  }
+
+  async readData(spreadsheetId: string, range: string) {
+    const data = await gapi.client.sheets.spreadsheets.values.get({
+      spreadsheetId: spreadsheetId,
+      range,
+    });
+
+    return data.result.values as Table | undefined;
   }
 }

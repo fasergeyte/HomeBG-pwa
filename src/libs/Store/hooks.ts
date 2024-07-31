@@ -36,7 +36,7 @@ export function useStoreGetAllAsMap<Name extends StoreName>(store: Name) {
     useMemo(() => {
       if (!list) return;
 
-      return toMap<StoreValue<Name>["id"], StoreValue<Name>>(list);
+      return toMap(list, "id");
     }, [list]);
   return { map };
 }

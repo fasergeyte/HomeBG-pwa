@@ -1,5 +1,6 @@
 import {
   AppBar,
+  CircularProgress,
   Drawer,
   IconButton,
   MenuItem,
@@ -12,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useState } from "react";
 import { GoogleSync } from "@libs/GoogleSync";
+import { error } from ".";
 
 interface HeaderProps {
   title: string;
@@ -22,6 +24,7 @@ export function Header(props: HeaderProps) {
   const { title, hasBack } = props;
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
 
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
@@ -62,13 +65,21 @@ export function Header(props: HeaderProps) {
           display: { xs: "block", sm: "none" },
         }}
       >
-        <MenuList>
+        <MenuList sx={{ width: 175 }}>
           <MenuItem
+            disabled={isSyncing}
             onClick={async () => {
-              await GoogleSync.sync();
+              setIsSyncing(true);
+              try {
+                await GoogleSync.sync();
+              } catch (e) {
+                error("Sync error", e);
+              }
+              setIsSyncing(false);
             }}
           >
             Синхронизация
+            {isSyncing && <CircularProgress sx={{ ml: 1 }} size={16} />}
           </MenuItem>
         </MenuList>
       </Drawer>

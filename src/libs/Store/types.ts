@@ -10,6 +10,9 @@ export interface Group {
 export interface Player {
   name: string;
   id: number;
+  groups?: {
+    [groupId: number]: { name: string } | undefined;
+  };
 }
 
 export interface Game {
