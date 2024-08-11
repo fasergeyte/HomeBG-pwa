@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { toMap } from "../Common/utils/transforms";
 
-export const getStoreGetQueryKey = (store: StoreName, id?: string) => [
+export const getStoreGetQueryKey = (store: StoreName, id?: string | number) => [
   "StoreGetAllQueryKey",
   store,
   ...(id ? [id] : []),
@@ -19,7 +19,7 @@ export function useStoreGetAll<Name extends StoreName>(store: Name) {
 
 export function useStoreGet<Name extends StoreName>(
   store: Name,
-  id: string | undefined,
+  id: StoreValue<Name>["id"] | undefined,
   disabled = false
 ) {
   return useQuery({

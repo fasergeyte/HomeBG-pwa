@@ -14,14 +14,16 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { useState } from "react";
 import { GoogleSync } from "@libs/GoogleSync";
 import { error } from ".";
+import { paths } from "@libs/Routing";
 
 interface HeaderProps {
   title: string;
   hasBack?: boolean;
+  hasMenu?: boolean;
 }
 
 export function Header(props: HeaderProps) {
-  const { title, hasBack } = props;
+  const { title, hasBack, hasMenu = true } = props;
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -49,9 +51,11 @@ export function Header(props: HeaderProps) {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             {title}
           </Typography>
-          <IconButton color="inherit" edge="end" onClick={handleDrawerToggle}>
-            <MenuIcon />
-          </IconButton>
+          {hasMenu && (
+            <IconButton color="inherit" edge="end" onClick={handleDrawerToggle}>
+              <MenuIcon />
+            </IconButton>
+          )}
         </Toolbar>
       </AppBar>
       <Drawer
@@ -59,7 +63,8 @@ export function Header(props: HeaderProps) {
         open={mobileOpen}
         onClose={handleDrawerToggle}
         ModalProps={{
-          keepMounted: true, // Better open performance on mobile.
+          // Better open performance on mobile.
+          keepMounted: true,
         }}
         sx={{
           display: { xs: "block", sm: "none" },
@@ -80,6 +85,9 @@ export function Header(props: HeaderProps) {
           >
             Синхронизация
             {isSyncing && <CircularProgress sx={{ ml: 1 }} size={16} />}
+          </MenuItem>
+          <MenuItem onClick={() => navigate(paths.groups.getUrl())}>
+            Группы
           </MenuItem>
         </MenuList>
       </Drawer>
