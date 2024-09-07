@@ -22,6 +22,13 @@ export default defineConfig({
       manifest: {
         name: "Настолки",
         theme_color: "#1976d2",
+        start_url: "/HomeBG-pwa",
+        scope: "/HomeBG-pwa",
+        icons: [192, 256, 384, 512].map((x) => ({
+          src: `/HomeBG-pwa/vite.svg`,
+          sizes: `${x}x${x}`,
+          type: "image/svg+xml",
+        })),
       },
       workbox: {
         runtimeCaching: [
