@@ -1,5 +1,6 @@
 import {
   Game,
+  Group,
   PlayedGame,
   Player,
   useStoreAdd,
@@ -27,11 +28,13 @@ interface FormValues {
   date: Date;
   game: Game | string | null;
   result: { place: number; player: Player | string | null }[];
+  groups: Group[];
 }
 const defaultValues: Partial<FormValues> = {
   date: new Date(),
   game: null,
   result: [{ place: 1, player: null }],
+  groups: [],
 };
 
 export function PlayedGameDialog() {
@@ -41,6 +44,7 @@ export function PlayedGameDialog() {
 
   const { data: players } = useStoreGetAll("player");
   const { data: games } = useStoreGetAll("game");
+  const { data: groups } = useStoreGetAll("group");
 
   const { mutateAsync: addPlayer } = useStoreAdd("player");
   const { mutateAsync: addGame } = useStoreAdd("game");
@@ -62,8 +66,12 @@ export function PlayedGameDialog() {
         place: res.place,
         player: players?.find((p) => p.id === res.playerId),
       })),
+      groups:
+        editedGame.groupsIds
+          ?.map((gid) => groups?.find((g) => g.id === gid))
+          .filter((g): g is Group => !!g) ?? [],
     });
-  }, [editedGame, games, players, reset]);
+  }, [editedGame, games, groups, players, reset]);
 
   const result = watch("result");
 
@@ -140,6 +148,7 @@ export function PlayedGameDialog() {
         gameId,
         result: await Promise.all(result),
         modifiedAt: new Date(),
+        groupsIds: values.groups.map((g) => g.id),
       };
 
       if (!editedGame) {
@@ -148,7 +157,7 @@ export function PlayedGameDialog() {
         putPlayedGame(toSave);
       }
 
-      navigate("..", { replace: true });
+      navigate(-1);
     } catch (e) {
       console.error(e);
     }
@@ -262,6 +271,24 @@ export function PlayedGameDialog() {
             </IconButton>
           </Stack>
         ))}
+        <Controller
+          name={"groups"}
+          control={control}
+          render={({ field }) => (
+            <Autocomplete
+              {...field}
+              onChange={(e, val) => field.onChange(val)}
+              sx={{ mt: 1 }}
+              multiple={true}
+              options={groups ?? []}
+              getOptionLabel={(option) => option.name}
+              isOptionEqualToValue={(opt, value) => opt.id === value.id}
+              renderInput={(params) => (
+                <TextField {...params} variant="outlined" label="группы" />
+              )}
+            />
+          )}
+        />
       </DialogContent>
       <DialogActions>
         <Button onClick={() => navigate(-1)}>Закрыть</Button>

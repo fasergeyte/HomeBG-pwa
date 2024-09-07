@@ -5,11 +5,6 @@ export enum HomeSection {
 }
 
 export const paths = {
-  playedGameDialog: {
-    route: `playedGameDlg/:id?`,
-    getUrl: (params?: { id?: string | number }) =>
-      `playedGameDlg/${params?.id ?? ""}`,
-  },
   root: {
     route: `/*`,
     getUrl: () => "/",
@@ -19,9 +14,25 @@ export const paths = {
     getUrl: (params?: { section?: HomeSection }) =>
       `/home/${params?.section ?? HomeSection.PlayedGames}`,
   },
+  playedGameDialog: {
+    route: `playedGameDlg/:id?`,
+    getUrl: (params?: { id?: string | number }) =>
+      `playedGameDlg/${params?.id ?? ""}`,
+  },
+
   playerStats: {
     route: `/stats/player/:id`,
     getUrl: (params?: { id: string | number }) => `/stats/player/${params?.id}`,
+  },
+
+  groups: {
+    route: `${basePath}/groups/*`,
+    getUrl: () => `${basePath}/groups`,
+  },
+  groupDialog: {
+    route: `groupDialog/:id?`,
+    getUrl: (params?: { id?: string | number }) =>
+      `groupDialog/${params?.id ?? ""}`,
   },
 } as const;
 
