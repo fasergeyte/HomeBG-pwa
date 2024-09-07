@@ -26,8 +26,8 @@ export const paths = {
   },
 
   groups: {
-    route: `${basePath}/groups/*`,
-    getUrl: () => `${basePath}/groups`,
+    route: `/groups/*`,
+    getUrl: () => `/groups`,
   },
   groupDialog: {
     route: `groupDialog/:id?`,
