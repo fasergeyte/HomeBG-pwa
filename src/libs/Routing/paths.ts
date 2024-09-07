@@ -1,5 +1,3 @@
-const basePath = import.meta.env.BASE_URL.replace(/\/*$/, "");
-
 export enum HomeSection {
   PlayedGames = "playedGames",
   Players = "players",
@@ -13,18 +11,17 @@ export const paths = {
       `playedGameDlg/${params?.id ?? ""}`,
   },
   root: {
-    route: `${basePath}/*`,
-    getUrl: () => basePath,
+    route: `/*`,
+    getUrl: () => "/",
   },
   home: {
-    route: `${basePath}/home/:section?/*`,
+    route: `/home/:section?/*`,
     getUrl: (params?: { section?: HomeSection }) =>
-      `${basePath}/home/${params?.section ?? HomeSection.PlayedGames}`,
+      `/home/${params?.section ?? HomeSection.PlayedGames}`,
   },
   playerStats: {
-    route: `${basePath}/stats/player/:id`,
-    getUrl: (params?: { id: string | number }) =>
-      `${basePath}/stats/player/${params?.id}`,
+    route: `/stats/player/:id`,
+    getUrl: (params?: { id: string | number }) => `/stats/player/${params?.id}`,
   },
 } as const;
 
