@@ -13,7 +13,6 @@ import { Table } from "./types";
 import { isEqual } from "date-fns";
 const EMPTY_ROW: (string | number | null | undefined)[] = [];
 const DEFAULT_GROUP = "Все";
-const SHEET_TITLE = "Игры";
 
 const getDocumentTitle = (group: string) => `HomeBG-${group}`;
 const MAIN_SHEET_TITLE = `Игры`;
@@ -29,237 +28,236 @@ class GoogleSyncService {
 
   public async sync() {
     const db = await getDb();
-
-    let group = (await db.getAll("group")).at(0);
-    if (!group) {
-      await db.add("group", {
-        name: DEFAULT_GROUP,
-        documentName: SHEET_TITLE,
-      });
-      group = (await db.getAll("group")).at(0);
-    }
-    if (!group)
-      return error("Unexpected error: group should exist by id:", group);
-
-    const groupId = group.id;
-
+    const groups = await db.getAll("group");
+    const players = await db.getAll("player");
     const games = await db.getAll("game");
+
+    const playedGames = await db.getAll("playedGame");
+    const localPlayedGamesMap = toMap(playedGames, "id");
+
     const gamesMap = toMap(games, "id");
     const gamesMapByName = toMap(games, "name");
 
-    const players = await db.getAll("player");
     const playersMap = toMap(players, "id");
     const playersMapByName = toMap(players, "name");
-    const playersMapByNameInGroup = toMapBy(
-      players,
-      (p) => p.groups?.[groupId]?.name
-    );
 
-    const playedGames = await db.getAll("playedGame");
+    for (const group of groups) {
+      const groupId = group.id;
 
-    const playersToUpdate = new Set<number>();
-    playedGames.forEach((pg) => {
-      pg.result.forEach(({ playerId }) => {
-        playersToUpdate.add(playerId);
-      });
-    });
-
-    await this.gSheets.ensureAuth();
-
-    let spreadsheetId: string;
-    if (!group.documentId) {
-      const ss = await this.gSheets.createSpreadsheet(
-        getDocumentTitle(group.name),
-        [MAIN_SHEET_TITLE]
+      const playersMapByNameInGroup = toMapBy(
+        players,
+        (p) => p.groups?.[groupId]?.name
       );
-      const sheetId = ss.sheets?.[0].properties?.sheetId;
-      if (!ss.spreadsheetId || isNil(sheetId)) {
-        error("Unexpected answer on createSpreadsheet:", ss);
-        return;
-      }
 
-      await db.put("group", { ...group, documentId: ss.spreadsheetId });
+      const groupPlayedGames = playedGames.filter((pg) =>
+        pg.groupsIds?.includes(group.id)
+      );
 
-      spreadsheetId = ss.spreadsheetId;
-    } else {
-      spreadsheetId = group.documentId;
-    }
+      const playersToUpdate = new Set<number>();
+      groupPlayedGames.forEach((pg) => {
+        pg.result.forEach(({ playerId }) => {
+          playersToUpdate.add(playerId);
+        });
+      });
 
-    // -- getUpdates
-    const remoteUpdates: { old?: TableGame; new: PlayedGame }[] = [];
-    const localUpdates: { new: RemotePlayedGame }[] = [];
+      await this.gSheets.ensureAuth();
 
-    const localPlayedGamesMap = toMap(playedGames, "id");
-    const remoteIds = new Set<string>();
-    const fullRemoteTable = await this.readAll(spreadsheetId);
-    const gamesTables = this.splitToGames(fullRemoteTable);
-
-    for (let i = 0; i < gamesTables.length; i++) {
-      // go from end so that ignore earlier items if id are the same
-      const gameTable = gamesTables[gamesTables.length - 1 - i];
-
-      const remote = this.parseGameTable(gameTable.data);
-      if (!remote) return;
-
-      if (remoteIds.has(remote.id)) continue;
-
-      remoteIds.add(remote.id);
-
-      const local = localPlayedGamesMap.get(remote.id);
-
-      if (!local) {
-        localUpdates.push({ new: remote });
-        continue;
-      }
-
-      if (isEqual(local.modifiedAt, remote.modifiedAt)) continue;
-
-      if (local.modifiedAt > remote.modifiedAt) {
-        remoteUpdates.push({ new: local, old: gameTable });
-        continue;
-      }
-
-      if (local.modifiedAt < remote.modifiedAt) {
-        localUpdates.push({ new: remote });
-      }
-    }
-
-    playedGames.forEach((g) => {
-      if (!remoteIds.has(g.id)) {
-        remoteUpdates.push({ new: g });
-      }
-    });
-
-    const updateRemote = async (): Promise<string | undefined> => {
-      const updates: Table = [];
-
-      remoteUpdates.forEach((upd) => {
-        updates.push(
-          [],
-          ...this.toGameTable(upd.new, gamesMap, playersMap, groupId)
+      let spreadsheetId: string;
+      if (!group.documentId) {
+        const ss = await this.gSheets.createSpreadsheet(
+          getDocumentTitle(group.name),
+          [MAIN_SHEET_TITLE]
         );
-      });
-
-      if (!updates.length) return;
-
-      const spreadsheet = await this.gSheets.get(spreadsheetId);
-      const sheetId = spreadsheet.sheets?.[0].properties?.sheetId;
-
-      if (!sheetId) {
-        error("Cannot get sheetId for update.");
-        return;
-      }
-
-      await this.gSheets.writeData(
-        spreadsheetId,
-        sheetId,
-        0,
-        fullRemoteTable.length,
-        updates
-      );
-      console.log("Remote updates", {
-        spreadsheetId,
-        sheetId,
-        offset: fullRemoteTable.length,
-        updates,
-      });
-      // TODO: remove old data (task:6)
-    };
-
-    const updateLocal = async (): Promise<void> => {
-      // updating player's aliases
-      await Promise.all(
-        Array.from(playersToUpdate, (playerId) => {
-          const player = playersMap.get(playerId);
-
-          if (player?.groups?.[groupId]?.name) {
-            return;
-          }
-
-          if (!player) throw new Error("player should exist.");
-          const updatedPlayer = {
-            ...player,
-            groups: {
-              ...player.groups,
-              [groupId]: { name: player.name },
-            },
-          };
-          console.log("Local updates: player alias:", updatedPlayer);
-
-          return db.put("player", updatedPlayer);
-        })
-      );
-      // --
-
-      const playedGamesUpdates: PlayedGame[] = [];
-      const gamesByName = new Map();
-
-      for (const game of gamesMap.values()) {
-        gamesByName.set(game.name, game);
-      }
-
-      for (const { new: remote } of localUpdates) {
-        let gameId = gamesMapByName.get(remote.gameName)?.id;
-
-        if (!gameId) {
-          gameId = await db.add("game", { name: remote.gameName });
-          console.log("Local updates: new game:", remote.gameName);
+        const sheetId = ss.sheets?.[0].properties?.sheetId;
+        if (!ss.spreadsheetId || isNil(sheetId)) {
+          error("Unexpected answer on createSpreadsheet:", ss);
+          return;
         }
 
-        const result: PlayedGame["result"] = [];
-        for (const remoteRes of remote.result) {
-          const player = playersMapByNameInGroup.get(remoteRes.playerName);
+        await db.put("group", { ...group, documentId: ss.spreadsheetId });
 
-          if (player) {
-            result.push({ playerId: player.id, place: remoteRes.place });
-            continue;
+        spreadsheetId = ss.spreadsheetId;
+      } else {
+        spreadsheetId = group.documentId;
+      }
+
+      // -- getUpdates
+      const remoteUpdates: { old?: TableGame; new: PlayedGame }[] = [];
+      const localUpdates: { new: RemotePlayedGame }[] = [];
+
+      const remoteIds = new Set<string>();
+      const fullRemoteTable = await this.readAll(spreadsheetId);
+      const gamesTables = this.splitToGames(fullRemoteTable);
+
+      for (let i = 0; i < gamesTables.length; i++) {
+        // go from end so that ignore earlier items if id are the same
+        const gameTable = gamesTables[gamesTables.length - 1 - i];
+
+        const remote = this.parseGameTable(gameTable.data);
+        if (!remote) return;
+
+        if (remoteIds.has(remote.id)) continue;
+
+        remoteIds.add(remote.id);
+
+        const local = localPlayedGamesMap.get(remote.id);
+
+        if (!local) {
+          localUpdates.push({ new: remote });
+          continue;
+        }
+
+        if (isEqual(local.modifiedAt, remote.modifiedAt)) continue;
+
+        if (local.modifiedAt > remote.modifiedAt) {
+          remoteUpdates.push({ new: local, old: gameTable });
+          continue;
+        }
+
+        if (local.modifiedAt < remote.modifiedAt) {
+          localUpdates.push({ new: remote });
+        }
+      }
+
+      groupPlayedGames.forEach((g) => {
+        if (!remoteIds.has(g.id)) {
+          remoteUpdates.push({ new: g });
+        }
+      });
+
+      const updateRemote = async (): Promise<string | undefined> => {
+        const updates: Table = [];
+
+        remoteUpdates.forEach((upd) => {
+          updates.push(
+            [],
+            ...this.toGameTable(upd.new, gamesMap, playersMap, groupId)
+          );
+        });
+
+        if (!updates.length) return;
+
+        const spreadsheet = await this.gSheets.get(spreadsheetId);
+        const sheetId = spreadsheet.sheets?.[0].properties?.sheetId;
+
+        if (!sheetId) {
+          error("Cannot get sheetId for update.");
+          return;
+        }
+
+        await this.gSheets.writeData(
+          spreadsheetId,
+          sheetId,
+          0,
+          fullRemoteTable.length,
+          updates
+        );
+        console.log("Remote updates", {
+          spreadsheetId,
+          sheetId,
+          offset: fullRemoteTable.length,
+          updates,
+        });
+        // TODO: remove old data (task:6)
+      };
+
+      const updateLocal = async function (): Promise<void> {
+        // updating player's aliases
+        await Promise.all(
+          Array.from(playersToUpdate, (playerId) => {
+            const player = playersMap.get(playerId);
+
+            if (player?.groups?.[groupId]?.name) {
+              return;
+            }
+
+            if (!player) throw new Error("player should exist.");
+            const updatedPlayer = {
+              ...player,
+              groups: {
+                ...player.groups,
+                [groupId]: { name: player.name },
+              },
+            };
+            console.log("Local updates: player alias:", updatedPlayer);
+
+            return db.put("player", updatedPlayer);
+          })
+        );
+        // --
+
+        const playedGamesUpdates: PlayedGame[] = [];
+        const gamesByName = new Map();
+
+        for (const game of gamesMap.values()) {
+          gamesByName.set(game.name, game);
+        }
+
+        for (const { new: remote } of localUpdates) {
+          let gameId = gamesMapByName.get(remote.gameName)?.id;
+
+          if (!gameId) {
+            gameId = await db.add("game", { name: remote.gameName });
+            console.log("Local updates: new game:", remote.gameName);
           }
 
-          const notLinkedPlayer = playersMapByName.get(remoteRes.playerName);
+          const result: PlayedGame["result"] = [];
+          for (const remoteRes of remote.result) {
+            const player = playersMapByNameInGroup.get(remoteRes.playerName);
 
-          if (!notLinkedPlayer) {
+            if (player) {
+              result.push({ playerId: player.id, place: remoteRes.place });
+              continue;
+            }
+
+            const notLinkedPlayer = playersMapByName.get(remoteRes.playerName);
+
+            if (!notLinkedPlayer) {
+              const newPlayer = {
+                name: remoteRes.playerName,
+                groups: { [groupId]: { name: remoteRes.playerName } },
+              };
+              const playerId = await db.add("player", newPlayer);
+              console.log("Local updates: new player:", newPlayer);
+
+              result.push({ playerId, place: remoteRes.place });
+              continue;
+            }
+
+            // TODO: task 7
             const newPlayer = {
-              name: remoteRes.playerName,
+              name: `${DEFAULT_GROUP}: ${remoteRes.playerName}`,
               groups: { [groupId]: { name: remoteRes.playerName } },
             };
             const playerId = await db.add("player", newPlayer);
             console.log("Local updates: new player:", newPlayer);
 
             result.push({ playerId, place: remoteRes.place });
-            continue;
           }
 
-          // TODO: task 7
-          const newPlayer = {
-            name: `${DEFAULT_GROUP}: ${remoteRes.playerName}`,
-            groups: { [groupId]: { name: remoteRes.playerName } },
-          };
-          const playerId = await db.add("player", newPlayer);
-          console.log("Local updates: new player:", newPlayer);
+          const local = localPlayedGamesMap.get(remote.id);
 
-          result.push({ playerId, place: remoteRes.place });
+          playedGamesUpdates.push({
+            id: remote.id,
+            date: remote.date,
+            modifiedAt: remote.modifiedAt,
+            gameId: gameId,
+            result,
+            groupsIds: uniq([...(local?.groupsIds ?? []), groupId]),
+          });
         }
 
-        const local = localPlayedGamesMap.get(remote.id);
+        await Promise.all(
+          playedGamesUpdates.map((g) => db.put("playedGame", g))
+        );
 
-        playedGamesUpdates.push({
-          id: remote.id,
-          date: remote.date,
-          modifiedAt: remote.modifiedAt,
-          gameId: gameId,
-          result,
-          groupsIds: uniq([...(local?.groupsIds ?? []), groupId]),
-        });
-      }
+        if (playedGamesUpdates.length)
+          console.log("Local updates: played games:", playedGamesUpdates);
+      };
 
-      await Promise.all(playedGamesUpdates.map((g) => db.put("playedGame", g)));
-
-      if (playedGamesUpdates.length)
-        console.log("Local updates: played games:", playedGamesUpdates);
-    };
-
-    await updateRemote();
-    await updateLocal();
+      await updateRemote();
+      await updateLocal();
+    }
   }
 
   private splitToGames(table: Table) {
