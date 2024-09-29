@@ -1,35 +1,29 @@
 import {
-  Game,
   Group,
   PlayedGame,
-  Player,
   useStoreAdd,
   useStoreGet,
   useStoreGetAll,
   useStorePut,
 } from "@libs/Store";
-import { Divider, Stack, TextField, Typography } from "@mui/material";
+import { Box, Divider, TextField } from "@mui/material";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import { DatePicker } from "@mui/x-date-pickers";
-import { useForm, Controller, useFieldArray } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import * as React from "react";
-import IconButton from "@mui/material/IconButton";
-import DeleteIcon from "@mui/icons-material/Delete";
 import { useNavigate, useParams } from "react-router-dom";
 import { UrlParams } from "@libs/Routing/paths";
 import { v4 as uuid } from "uuid";
 import { Autocomplete } from "@libs/Common";
+import { GameResult } from "./GameResult";
+import { FormValues } from "./types";
+import { isNumber, isString } from "lodash";
+import { getGroupsForGame } from "@libs/Groups";
 
-interface FormValues {
-  date: Date;
-  game: Game | string | null;
-  result: { place: number; player: Player | string | null }[];
-  groups: Group[];
-}
 const defaultValues: Partial<FormValues> = {
   date: new Date(),
   game: null,
@@ -53,9 +47,26 @@ export function PlayedGameDialog() {
 
   const navigate = useNavigate();
 
-  const { control, watch, handleSubmit, reset } = useForm<FormValues>({
-    defaultValues,
-  });
+  const { control, watch, handleSubmit, reset, setValue, getFieldState } =
+    useForm<FormValues>({
+      defaultValues,
+    });
+  const result = watch("result");
+
+  React.useEffect(() => {
+    if (editedGame) return;
+    const fs = getFieldState("groups");
+    if (fs.isDirty) return;
+
+    const groupsByRules = getGroupsForGame(groups, {
+      playerIds: result
+        .map((res) => !isString(res?.player) && res.player?.id)
+        .filter(isNumber),
+    });
+
+    setValue("groups", groupsByRules ?? [], { shouldTouch: false });
+    return;
+  }, [editedGame, getFieldState, groups, result, setValue]);
 
   React.useEffect(() => {
     if (!editedGame) return;
@@ -72,24 +83,6 @@ export function PlayedGameDialog() {
           .filter((g): g is Group => !!g) ?? [],
     });
   }, [editedGame, games, groups, players, reset]);
-
-  const result = watch("result");
-
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "result",
-  });
-
-  const lastPlayer = result.at(-1)?.player;
-
-  React.useEffect(() => {
-    if (lastPlayer || result.length === 0) {
-      append(
-        { place: result.length + 1, player: null },
-        { shouldFocus: false }
-      );
-    }
-  }, [append, result, lastPlayer]);
 
   const onSubmit = async (values: FormValues) => {
     try {
@@ -205,90 +198,29 @@ export function PlayedGameDialog() {
             />
           )}
         />
-        <Typography variant="h6">Результат</Typography>
-        {fields.map((field, index) => (
-          <Stack key={field.id} direction="row">
-            <Controller
-              name={`result.${index}.place`}
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  size="small"
-                  inputProps={field}
-                  type="number"
-                  sx={{
-                    width: "60px",
-                    "& .MuiInputBase-root": {
-                      borderBottomRightRadius: 0,
-                      borderTopRightRadius: 0,
-                      borderBottomLeftRadius:
-                        fields.length - 1 === index ? 4 : 0,
-                      borderTopLeftRadius: 0 === index ? 4 : 0,
-                    },
-                  }}
-                />
-              )}
-            />
-            <Controller
-              name={`result.${index}.player`}
-              control={control}
-              render={({ field: { onChange, ...props } }) => (
-                <Autocomplete
-                  onChange={(e, val) => {
-                    onChange(val);
-                  }}
-                  fullWidth={true}
-                  freeSolo={true}
-                  clearOnBlur={true}
-                  autoSelect={true}
-                  options={players ?? []}
-                  loading={players === undefined}
-                  getOptionLabel={(val) =>
-                    typeof val === "string" ? val : val.name
-                  }
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      size="small"
-                      placeholder="игрок"
-                      sx={{
-                        "& .MuiInputBase-root": {
-                          borderBottomLeftRadius: 0,
-                          borderTopLeftRadius: 0,
-                          borderBottomRightRadius:
-                            fields.length - 1 === index ? 4 : 0,
-                          borderTopRightRadius: 0 === index ? 4 : 0,
-                        },
-                      }}
-                    />
-                  )}
-                  {...props}
-                />
-              )}
-            />
-            <IconButton onClick={() => remove(index)}>
-              <DeleteIcon />
-            </IconButton>
-          </Stack>
-        ))}
-        <Controller
-          name={"groups"}
-          control={control}
-          render={({ field }) => (
-            <Autocomplete
-              {...field}
-              onChange={(e, val) => field.onChange(val)}
-              sx={{ mt: 1 }}
-              multiple={true}
-              options={groups ?? []}
-              getOptionLabel={(option) => option.name}
-              isOptionEqualToValue={(opt, value) => opt.id === value.id}
-              renderInput={(params) => (
-                <TextField {...params} variant="outlined" label="группы" />
-              )}
-            />
-          )}
-        />
+        <Box mt={1}>
+          <GameResult control={control} />
+        </Box>
+        <Box mt={2}>
+          <Controller
+            name={"groups"}
+            control={control}
+            render={({ field }) => (
+              <Autocomplete
+                {...field}
+                onChange={(e, val) => field.onChange(val)}
+                sx={{ mt: 1 }}
+                multiple={true}
+                options={groups ?? []}
+                getOptionLabel={(option) => option.name}
+                isOptionEqualToValue={(opt, value) => opt.id === value.id}
+                renderInput={(params) => (
+                  <TextField {...params} variant="outlined" label="группы" />
+                )}
+              />
+            )}
+          />
+        </Box>
       </DialogContent>
       <DialogActions>
         <Button onClick={() => navigate(-1)}>Закрыть</Button>

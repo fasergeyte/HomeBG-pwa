@@ -1,10 +1,16 @@
 import * as idb from "idb";
 
+export type Rule = {
+  type: "players";
+  playerIds: number[];
+};
+
 export interface Group {
   id: number;
   name: string;
   documentName?: string;
   documentId?: string;
+  rules?: Rule[];
 }
 
 export interface Player {
