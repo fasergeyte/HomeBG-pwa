@@ -1,0 +1,22 @@
+{
+  "name": "homebg-server",
+  "version": "1.0.0",
+  "description": "Server for the app home bg",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "nodemon src/index.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "ts-node": "^6.1.3",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.7.4",
+    "nodemon": "^3.1.7"
+  },
+  "dependencies": {
+    "express": "^4.21.1",
+    "dotenv": "16.4.5"
+  }
+}

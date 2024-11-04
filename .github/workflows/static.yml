@@ -37,20 +37,21 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
+        working-directory: ./client
         run: npm ci
 
       - name: Build project
+        working-directory: ./client
         run: npm run build -- --base="/HomeBG-pwa/"
-    
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist'
+          path: "./client/dist"
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
- 
