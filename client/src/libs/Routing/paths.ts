@@ -9,6 +9,10 @@ export const paths = {
     route: `/*`,
     getUrl: () => "/",
   },
+  auth: {
+    route: `/auth/:token`,
+    getUrl: (params: { token: string }) => `auth/${params.token}`,
+  },
   home: {
     route: `/home/:section?/*`,
     getUrl: (params?: { section?: HomeSection }) =>

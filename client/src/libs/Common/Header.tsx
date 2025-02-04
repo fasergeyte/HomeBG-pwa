@@ -15,6 +15,7 @@ import { useState } from "react";
 import { GoogleSync } from "@libs/GoogleSync";
 import { error } from ".";
 import { paths } from "@libs/Routing";
+import { AuthMenuItem } from "./AuthMenuItem";
 
 interface HeaderProps {
   title: string;
@@ -71,6 +72,7 @@ export function Header(props: HeaderProps) {
         }}
       >
         <MenuList sx={{ width: 175 }}>
+          <AuthMenuItem />
           <MenuItem
             disabled={isSyncing}
             onClick={async () => {

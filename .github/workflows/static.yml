@@ -38,7 +38,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./client
-        run: npm ci
+        run: npm ci --force
 
       - name: Build project
         working-directory: ./client
