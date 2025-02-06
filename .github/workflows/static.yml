@@ -42,6 +42,8 @@ jobs:
 
       - name: Build project
         working-directory: ./client
+        env:
+          VITE_BACKEND_URL: ${{ vars.VITE_API_URL }}
         run: npm run build -- --base="/HomeBG-pwa/"
 
       - name: Setup Pages
