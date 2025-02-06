@@ -22,7 +22,7 @@ concurrency:
   cancel-in-progress: false
   
 env:
-  VITE_BACKEND_URL: ${{ vars.VITE_API_URL }}
+  VITE_API_URL: ${{ vars.VITE_API_URL }}
   
 jobs:
   build-deploy:
