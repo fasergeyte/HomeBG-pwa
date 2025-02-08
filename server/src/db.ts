@@ -46,9 +46,7 @@ export async function findOneUser(constrains: Partial<User>) {
   const keys = Object.keys(constrains) as (keyof User)[];
 
   const user = db.data.users.find((user) => {
-    return keys.every((key) => {
-      key in user && user[key] === constrains[key];
-    });
+    return keys.every((key) => key in user && user[key] === constrains[key]);
   });
 
   return user;

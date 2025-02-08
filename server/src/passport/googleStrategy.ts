@@ -12,7 +12,6 @@ export const googleStrategy = new GoogleStrategy(
     callbackURL: `/auth/google/callback`,
   },
   async (accessToken, refreshToken, profile, done) => {
-    console.log("callback", accessToken);
     const user = await findOneUser({ googleId: profile.id });
 
     if (user) {
