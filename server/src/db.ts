@@ -33,6 +33,7 @@ export async function createUser(user: Omit<User, "id">) {
 
   try {
     await db.write();
+    console.log("User created:", user.name);
   } catch (e) {
     console.log("db write error", e);
   }
