@@ -29,7 +29,6 @@ router.get(
   passport.authenticate("google", { session: false }),
   async (req, res) => {
     try {
-      console.log("/google/callback");
       const user = req.user!;
 
       const authToken = await jwt.sign(user, JWT_SECRET);

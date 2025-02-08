@@ -8,6 +8,7 @@ export const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET as string;
 export const PORT = process.env.PORT as string;
 
 export const FRONT_BASE_URL = process.env.FRONT_BASE_URL as string;
+export const BACK_BASE_URL = process.env.BACK_BASE_URL as string;
 
 export const DATA_DIR = process.env.DATA_DIR as string;
 
