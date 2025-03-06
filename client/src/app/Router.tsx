@@ -2,7 +2,6 @@ import { Route, BrowserRouter, Routes, Navigate } from "react-router-dom";
 import { HomePage } from "./pages/HomePage";
 import { paths } from "@libs/Routing";
 import { StatsPage } from "./pages/StatsPage";
-import { GroupsPage } from "./pages/GroupsPage";
 import { Auth } from "./Auth";
 
 export function Router() {
@@ -11,7 +10,6 @@ export function Router() {
       <Routes>
         <Route path={paths.home.route} element={<HomePage />} />
         <Route path={paths.playerStats.route} element={<StatsPage />} />
-        <Route path={paths.groups.route} element={<GroupsPage />} />
         <Route path={paths.auth.route} element={<Auth />} />
         <Route
           path="*"

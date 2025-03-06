@@ -7,7 +7,7 @@ import { useStoreGetAllAsMap } from "@libs/Store";
 
 export function Stats() {
   const params = useParams<UrlParams<"playerStats">>();
-  const playerId = params.id === undefined ? undefined : Number(params.id);
+  const playerId = params.id;
   const { map: gamesMap } = useStoreGetAllAsMap("game");
   const stats = useStats(playerId);
 
@@ -26,7 +26,7 @@ export function Stats() {
         Object.entries(stats.gamesStats).map(([gameId, gameStats]) => (
           <PlayersStatsCard
             key={gameId}
-            title={gamesMap?.get(Number(gameId))?.name ?? ""}
+            title={gamesMap?.get(gameId)?.name ?? ""}
             total={gameStats.total}
             wins={gameStats.wins}
             defeats={gameStats.defeats}

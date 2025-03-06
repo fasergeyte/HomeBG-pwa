@@ -1,41 +1,67 @@
 import * as idb from "idb";
 
+export type Rule = {
+  type: "players";
+  playerIds: number[];
+};
+
+export interface Group {
+  id: number;
+  name: string;
+  documentName?: string;
+  documentId?: string;
+  rules?: Rule[];
+}
+
 export interface Player {
   name: string;
-  id: string;  
-  modifiedAt: Date;
+  id: number;
+  groups?: {
+    [groupId: number]: { name: string } | undefined;
+  };
 }
 
 export interface Game {
   name: string;
-  id: string;
-  modifiedAt: Date;
+  id: number;
 }
 
 export interface PlayedGame {
   id: string;
   /** Дата партии */
   date: Date;
+  /** Изменена */
   modifiedAt: Date;
-  result: { place: number; playerId: string }[];
-  gameId: string;
+  result: { place: number; playerId: number }[];
+  gameId: number;
+  groupsIds?: number[];
 }
 
 export interface BgDbSchema extends idb.DBSchema {
   player: {
     value: Player;
-    key: string;
-    indexes: { id: string; name: string };
+    key: number;
+    indexes: { id: number; name: string };
   };
   game: {
     value: Game;
-    key: string;
-    indexes: { id: string; name: string };
+    key: number;
+    indexes: { id: number; name: string };
   };
   playedGame: {
     value: PlayedGame;
     key: string;
-    indexes: { id: string; date: Date; gameId: string };
+    indexes: { id: string; date: string; gameId: number };
+  };
+  group: {
+    value: Group;
+    key: number;
+    indexes: {
+      id: number;
+      name: number;
+      documentName: string;
+      documentId: string;
+    };
   };
 }
 

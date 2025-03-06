@@ -33,7 +33,7 @@ export function Games() {
 
   const onAdd = () => setIsAdding(true);
 
-  const actions: ContextMenuItem<number>[] = [
+  const actions: ContextMenuItem<string>[] = [
     {
       label: "Удалить",
       action: (id) => deleteGame(id),

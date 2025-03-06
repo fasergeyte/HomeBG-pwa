@@ -12,9 +12,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useState } from "react";
-import { GoogleSync } from "@libs/GoogleSync";
 import { error } from ".";
-import { paths } from "@libs/Routing";
 import { AuthMenuItem } from "./AuthMenuItem";
 
 interface HeaderProps {
@@ -78,7 +76,7 @@ export function Header(props: HeaderProps) {
             onClick={async () => {
               setIsSyncing(true);
               try {
-                await GoogleSync.sync();
+                // TODO: sync
               } catch (e) {
                 error("Sync error", e);
               }
@@ -87,9 +85,6 @@ export function Header(props: HeaderProps) {
           >
             Синхронизация
             {isSyncing && <CircularProgress sx={{ ml: 1 }} size={16} />}
-          </MenuItem>
-          <MenuItem onClick={() => navigate(paths.groups.getUrl())}>
-            Группы
           </MenuItem>
         </MenuList>
       </Drawer>
