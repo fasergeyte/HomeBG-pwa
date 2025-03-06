@@ -11,7 +11,6 @@ interface PlayedGameListItemProps {
 export function PlayedGameListItem(props: PlayedGameListItemProps) {
   const { onClick, playedGame } = props;
 
-  const { map: groupsMap } = useStoreGetAllAsMap("group");
   const { map: playersMap } = useStoreGetAllAsMap("player");
   const { map: gamesMap } = useStoreGetAllAsMap("game");
   const game = gamesMap?.get(playedGame.gameId);
@@ -23,8 +22,6 @@ export function PlayedGameListItem(props: PlayedGameListItemProps) {
       ),
     [playedGame.result, playersMap]
   );
-
-  const groups = playedGame.groupsIds?.map((id) => groupsMap?.get(id));
 
   return (
     <>
@@ -71,18 +68,6 @@ export function PlayedGameListItem(props: PlayedGameListItemProps) {
           >
             {players.join(", ")}
           </Typography>
-          <Stack direction={"row"} spacing={0.5} gap={0.5} flexWrap={"wrap"}>
-            {groups?.map((g, idx) => (
-              <Chip
-                key={g?.id ?? idx}
-                size={"small"}
-                label={g?.name}
-                sx={{
-                  maxWidth: 80,
-                }}
-              />
-            ))}
-          </Stack>
         </Box>
       </ListItemButton>
     </>

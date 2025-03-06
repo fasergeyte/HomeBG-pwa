@@ -9,16 +9,16 @@ interface GameStats {
 
 interface PlayersStats {
   total: GameStats;
-  gamesStats: Record<number, GameStats>;
+  gamesStats: Record<string, GameStats>;
 }
 
-export function useStats(playerId: number | undefined) {
+export function useStats(playerId: string | undefined) {
   const { data: playedGames } = useStoreGetAll("playedGame");
   return useMemo(
     () =>
       playedGames?.reduce<PlayersStats>(
         (stats, g) => {
-          const result = g.result.find((id) => id.playerId === playerId);
+          const result = g.result.find((item) => item.playerId === playerId);
           if (!result) return stats;
 
           const gameStats =

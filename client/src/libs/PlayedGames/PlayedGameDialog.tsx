@@ -1,5 +1,4 @@
 import {
-  Group,
   PlayedGame,
   useStoreAdd,
   useStoreGet,
@@ -21,14 +20,11 @@ import { v4 as uuid } from "uuid";
 import { Autocomplete } from "@libs/Common";
 import { GameResult } from "./GameResult";
 import { FormValues } from "./types";
-import { isNumber, isString } from "lodash";
-import { getGroupsForGame } from "@libs/Groups";
 
 const defaultValues: Partial<FormValues> = {
   date: new Date(),
   game: null,
   result: [{ place: 1, player: null }],
-  groups: [],
 };
 
 export function PlayedGameDialog() {
@@ -38,7 +34,6 @@ export function PlayedGameDialog() {
 
   const { data: players } = useStoreGetAll("player");
   const { data: games } = useStoreGetAll("game");
-  const { data: groups } = useStoreGetAll("group");
 
   const { mutateAsync: addPlayer } = useStoreAdd("player");
   const { mutateAsync: addGame } = useStoreAdd("game");
@@ -47,26 +42,9 @@ export function PlayedGameDialog() {
 
   const navigate = useNavigate();
 
-  const { control, watch, handleSubmit, reset, setValue, getFieldState } =
-    useForm<FormValues>({
-      defaultValues,
-    });
-  const result = watch("result");
-
-  React.useEffect(() => {
-    if (editedGame) return;
-    const fs = getFieldState("groups");
-    if (fs.isDirty) return;
-
-    const groupsByRules = getGroupsForGame(groups, {
-      playerIds: result
-        .map((res) => !isString(res?.player) && res.player?.id)
-        .filter(isNumber),
-    });
-
-    setValue("groups", groupsByRules ?? [], { shouldTouch: false });
-    return;
-  }, [editedGame, getFieldState, groups, result, setValue]);
+  const { control, handleSubmit, reset } = useForm<FormValues>({
+    defaultValues,
+  });
 
   React.useEffect(() => {
     if (!editedGame) return;
@@ -77,12 +55,8 @@ export function PlayedGameDialog() {
         place: res.place,
         player: players?.find((p) => p.id === res.playerId),
       })),
-      groups:
-        editedGame.groupsIds
-          ?.map((gid) => groups?.find((g) => g.id === gid))
-          .filter((g): g is Group => !!g) ?? [],
     });
-  }, [editedGame, games, groups, players, reset]);
+  }, [editedGame, games, players, reset]);
 
   const onSubmit = async (values: FormValues) => {
     try {
@@ -128,7 +102,7 @@ export function PlayedGameDialog() {
           ? game
           : games?.find((g) => g.name.toLowerCase() === game.toLowerCase());
 
-      const gameId: number =
+      const gameId: string =
         existedGame?.id ||
         (await addGame({
           // код выше гарантирует что сейчас это строка
@@ -141,7 +115,6 @@ export function PlayedGameDialog() {
         gameId,
         result: await Promise.all(result),
         modifiedAt: new Date(),
-        groupsIds: values.groups.map((g) => g.id),
       };
 
       if (!editedGame) {
@@ -200,26 +173,6 @@ export function PlayedGameDialog() {
         />
         <Box mt={1}>
           <GameResult control={control} />
-        </Box>
-        <Box mt={2}>
-          <Controller
-            name={"groups"}
-            control={control}
-            render={({ field }) => (
-              <Autocomplete
-                {...field}
-                onChange={(e, val) => field.onChange(val)}
-                sx={{ mt: 1 }}
-                multiple={true}
-                options={groups ?? []}
-                getOptionLabel={(option) => option.name}
-                isOptionEqualToValue={(opt, value) => opt.id === value.id}
-                renderInput={(params) => (
-                  <TextField {...params} variant="outlined" label="группы" />
-                )}
-              />
-            )}
-          />
         </Box>
       </DialogContent>
       <DialogActions>

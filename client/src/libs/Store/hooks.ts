@@ -44,8 +44,13 @@ export function useStoreGetAllAsMap<Name extends StoreName>(store: Name) {
 export function useStoreAdd<Name extends StoreName>(store: Name) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (entity: Omit<StoreValue<Name>, "id">) => {
-      const result = (await getDb()).add(store, entity);
+    mutationFn: async (entity: Omit<StoreValue<Name>, "id" | "modifiedAt">) => {
+      const dbEntity = {
+        ...entity,
+        modifiedAt: new Date(),
+      } as Omit<StoreValue<Name>, "id">;
+
+      const result = (await getDb()).add(store, dbEntity);
       qc.invalidateQueries({ queryKey: getStoreGetQueryKey(store) });
       return result;
     },
@@ -55,8 +60,13 @@ export function useStoreAdd<Name extends StoreName>(store: Name) {
 export function useStorePut<Name extends StoreName>(store: Name) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (entity: StoreValue<Name>) =>
-      (await getDb()).put(store, entity),
+    mutationFn: async (entity: Omit<StoreValue<Name>, "modifiedAt">) => {
+      const dbEntity = {
+        ...entity,
+        modifiedAt: new Date(),
+      } as StoreValue<Name>;
+      return (await getDb()).put(store, dbEntity);
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: getStoreGetQueryKey(store) });
     },

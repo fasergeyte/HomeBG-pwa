@@ -1,5 +1,4 @@
 import { Header } from "@libs/Common";
-import { Groups } from "@libs/Groups";
 import { Stack } from "@mui/material";
 
 export function GroupsPage() {
@@ -9,7 +8,6 @@ export function GroupsPage() {
       sx={{ width: "100%", height: "100vh", bgcolor: "background.level0" }}
     >
       <Header title="Группы" hasBack={true} hasMenu={false} />
-      <Groups />
     </Stack>
   );
 }
