@@ -1,15 +1,19 @@
-import { PlayedGame, useStoreGetAllAsMap } from "@libs/Store";
+import { ContextMenu, ContextMenuItem } from "@libs/Common";
+import { paths } from "@libs/Routing";
+import { PlayedGame, useStoreDelete, useStoreGetAllAsMap } from "@libs/Store";
 import { Box, Chip, ListItemButton, Stack, Typography } from "@mui/material";
 import { format } from "date-fns";
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
+import { Link } from "react-router";
 
 interface PlayedGameListItemProps {
   playedGame: PlayedGame;
-  onClick?: (id: string) => void;
 }
 
-export function PlayedGameListItem(props: PlayedGameListItemProps) {
-  const { onClick, playedGame } = props;
+export const PlayedGameListItemShell = memo(function PlayedGameListItemShell(
+  props: PlayedGameListItemProps
+) {
+  const { playedGame } = props;
 
   const { map: playersMap } = useStoreGetAllAsMap("player");
   const { map: gamesMap } = useStoreGetAllAsMap("game");
@@ -22,17 +26,25 @@ export function PlayedGameListItem(props: PlayedGameListItemProps) {
       ),
     [playedGame.result, playersMap]
   );
+  const { mutateAsync: deletePlayedGame } = useStoreDelete("playedGame");
 
+  const actions: ContextMenuItem<string>[] = [
+    {
+      label: "Удалить",
+      action: (id) => deletePlayedGame(id),
+    },
+  ];
   return (
-    <>
+    <ContextMenu key={playedGame.id} id={playedGame.id} actions={actions}>
       <ListItemButton
+        component={Link}
+        to={paths.playedGameDialog.getUrl({ id: playedGame.id })}
         sx={{
           p: 1,
           width: 1,
           my: 1 / 2,
           bgcolor: "background.paper",
         }}
-        onClick={() => onClick?.(playedGame.id)}
       >
         <Box
           sx={{
@@ -70,6 +82,6 @@ export function PlayedGameListItem(props: PlayedGameListItemProps) {
           </Typography>
         </Box>
       </ListItemButton>
-    </>
+          </ContextMenu>
   );
-}
+});

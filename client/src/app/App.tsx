@@ -7,9 +7,15 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { ru } from "date-fns/locale";
 import { createAppTheme } from "./lib/createAppTheme";
-import { ApiProvider } from "./ApiContext";
+import { ApiProvider } from "../libs/Api/ApiContext";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: Infinity,
+    },
+  },
+});
 
 const theme = createAppTheme();
 

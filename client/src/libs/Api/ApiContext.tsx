@@ -5,7 +5,9 @@ import Axios from "axios";
 import { AuthProvider } from "@bisham/react-jwt-auth";
 import { PropsWithChildren } from "react";
 
-const axios = Axios.create({
+// TODO: 
+// eslint-disable-next-line react-refresh/only-export-components
+export const axios = Axios.create({
   baseURL: import.meta.env.API_URL,
 });
 

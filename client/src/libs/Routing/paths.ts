@@ -28,6 +28,7 @@ export const paths = {
     route: `/stats/player/:id`,
     getUrl: (params?: { id: string | number }) => `/stats/player/${params?.id}`,
   },
+  
 } as const;
 
 export type IncomingParams<T extends keyof typeof paths> =

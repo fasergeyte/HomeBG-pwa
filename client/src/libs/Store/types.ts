@@ -1,41 +1,34 @@
+import type * as api from "bg-games-api";
 import * as idb from "idb";
-
-export interface Player {
-  name: string;
-  id: string;  
-  modifiedAt: Date;
-}
-
-export interface Game {
-  name: string;
+export interface Meta {
   id: string;
-  modifiedAt: Date;
+  syncDate?: Date;
 }
 
-export interface PlayedGame {
-  id: string;
-  /** Дата партии */
-  date: Date;
-  modifiedAt: Date;
-  result: { place: number; playerId: string }[];
-  gameId: string;
-}
+export type Player = api.Player;
+export type Game = api.Game;
+export type PlayedGame = api.PlayedGame;
 
 export interface BgDbSchema extends idb.DBSchema {
   player: {
     value: Player;
     key: string;
-    indexes: { id: string; name: string };
+    indexes: { id: string; name: string; modifiedAt: Date };
   };
   game: {
     value: Game;
     key: string;
-    indexes: { id: string; name: string };
+    indexes: { id: string; name: string; modifiedAt: Date };
   };
   playedGame: {
     value: PlayedGame;
     key: string;
-    indexes: { id: string; date: Date; gameId: string };
+    indexes: { id: string; date: Date; gameId: string; modifiedAt: Date };
+  };
+  meta: {
+    value: Meta;
+    key: string;
+    indexes: { id: string };
   };
 }
 
@@ -45,6 +38,12 @@ export type DataBase = Omit<idb.IDBPDatabase<BgDbSchema>, "add"> & {
     store: Name,
     value: Omit<idb.StoreValue<BgDbSchema, Name>, "id">
   ): Promise<idb.StoreKey<BgDbSchema, Name>>;
+
+  getAllNewerThan<StoreName extends "player" | "game" | "playedGame">(
+    this: DataBase,
+    storeName: StoreName,
+    date: Date
+  ): Promise<BgDbSchema[StoreName]["value"][]>;
 };
 
 export type StoreName = idb.StoreNames<BgDbSchema>;

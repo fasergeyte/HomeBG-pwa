@@ -12,7 +12,7 @@ import TextField from "@mui/material/TextField";
 import { useState } from "react";
 import { ContextMenu, ContextMenuItem } from "@libs/Common";
 import { paths } from "@libs/Routing";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 export function Players() {
   const navigate = useNavigate();

@@ -1,7 +1,7 @@
 import passport from "passport";
 import { googleStrategy } from "./googleStrategy";
 import { isString } from "lodash";
-import { findOneUser } from "../db";
+import { findOne } from "../db/db";
 import { jwtStrategy } from "./jwtStrategy";
 
 // initialize passport with Google and JWT strategies
@@ -13,7 +13,7 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser(async (id, done) => {
-  const user = isString(id) ? await findOneUser({ id }) : undefined;
+  const user = isString(id) ? await findOne("user", { id }) : undefined;
   done(null, user);
 });
 

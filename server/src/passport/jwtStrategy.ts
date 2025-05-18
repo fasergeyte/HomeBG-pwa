@@ -1,6 +1,6 @@
 import { Strategy, ExtractJwt, VerifiedCallback } from "passport-jwt";
 import bcrypt from "bcrypt";
-import { findOneUser } from "../db";
+import { findOne } from "../db/db";
 import { JWT_SECRET } from "../env";
 
 export const jwtStrategy = new Strategy(
@@ -22,7 +22,7 @@ export const jwtStrategy = new Strategy(
     }
 
     // try to find a User with the `id` in the JWT payload.
-    const user = await findOneUser({ id: payload.id });
+    const user = await findOne("user", { id: payload.id });
 
     // bad path: User is not found.
     if (!user) {
