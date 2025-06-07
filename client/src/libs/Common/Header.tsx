@@ -14,6 +14,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { useState } from "react";
 import { error } from ".";
 import { AuthMenuItem } from "./AuthMenuItem";
+import { IndexedDBBackup } from "@libs/Store";
 
 interface HeaderProps {
   title: string;
@@ -85,6 +86,13 @@ export function Header(props: HeaderProps) {
           >
             Синхронизация
             {isSyncing && <CircularProgress sx={{ ml: 1 }} size={16} />}
+          </MenuItem>
+          <MenuItem
+            onClick={async () => {
+              IndexedDBBackup.createAndDownloadBackup();
+            }}
+          >
+            Скачать бэкап файл
           </MenuItem>
         </MenuList>
       </Drawer>
