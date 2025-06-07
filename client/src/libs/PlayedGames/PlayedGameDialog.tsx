@@ -5,7 +5,7 @@ import {
   useStoreGetAll,
   useStorePut,
 } from "@libs/Store";
-import { Box, Divider, TextField } from "@mui/material";
+import { Box, Divider, Skeleton, TextField } from "@mui/material";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -14,7 +14,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import { DatePicker } from "@mui/x-date-pickers";
 import { useForm, Controller } from "react-hook-form";
 import * as React from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router";
 import { UrlParams } from "@libs/Routing/paths";
 import { v4 as uuid } from "uuid";
 import { Autocomplete } from "@libs/Common";
@@ -30,10 +30,15 @@ const defaultValues: Partial<FormValues> = {
 export function PlayedGameDialog() {
   const params = useParams<UrlParams<"playedGameDialog">>();
   const id = params.id === undefined ? undefined : params.id;
-  const { data: editedGame } = useStoreGet("playedGame", id, !id);
+  const { data: editedGame, isLoading: editedGameIsLoading } = useStoreGet(
+    "playedGame",
+    id,
+    !id
+  );
 
-  const { data: players } = useStoreGetAll("player");
-  const { data: games } = useStoreGetAll("game");
+  const { data: players, isLoading: playersIsLoading } =
+    useStoreGetAll("player");
+  const { data: games, isLoading: gamesIsLoading } = useStoreGetAll("game");
 
   const { mutateAsync: addPlayer } = useStoreAdd("player");
   const { mutateAsync: addGame } = useStoreAdd("game");
@@ -129,6 +134,8 @@ export function PlayedGameDialog() {
     }
   };
 
+  const isLoading = editedGameIsLoading || playersIsLoading || gamesIsLoading;
+
   return (
     <Dialog
       open={true}
@@ -141,38 +148,48 @@ export function PlayedGameDialog() {
       <DialogTitle>Игра</DialogTitle>
       <Divider />
       <DialogContent>
-        <Controller
-          name={"date"}
-          control={control}
-          render={({ field }) => (
-            <DatePicker label={"дата"} sx={{ width: 1 }} {...field} />
-          )}
-        />
-        <Controller
-          name={"game"}
-          control={control}
-          render={({ field: { onChange, ...props } }) => (
-            <Autocomplete
-              fullWidth={true}
-              sx={{ mt: 1 }}
-              onChange={(e, val) => {
-                onChange(val);
-              }}
-              freeSolo={true}
-              clearOnBlur={true}
-              autoSelect={true}
-              options={games ?? []}
-              loading={games === undefined}
-              getOptionLabel={(val) =>
-                typeof val === "string" ? val : val.name
-              }
-              renderInput={(params) => <TextField {...params} label="игра" />}
-              {...props}
-            />
-          )}
-        />
+        {isLoading ? (
+          <Skeleton variant="rectangular" height={56} width={246} />
+        ) : (
+          <Controller
+            name={"date"}
+            control={control}
+            render={({ field }) => (
+              <DatePicker label={"дата"} sx={{ width: 1 }} {...field} />
+            )}
+          />
+        )}
+
+        {isLoading ? (
+          <Skeleton variant="rectangular" height={56} />
+        ) : (
+          <Controller
+            name={"game"}
+            control={control}
+            render={({ field: { onChange, ...props } }) => (
+              <Autocomplete
+                fullWidth={true}
+                sx={{ mt: 1 }}
+                onChange={(e, val) => {
+                  onChange(val);
+                }}
+                freeSolo={true}
+                clearOnBlur={true}
+                autoSelect={true}
+                options={games ?? []}
+                loading={games === undefined}
+                getOptionLabel={(val) =>
+                  typeof val === "string" ? val : val.name
+                }
+                renderInput={(params) => <TextField {...params} label="игра" />}
+                {...props}
+              />
+            )}
+          />
+        )}
+
         <Box mt={1}>
-          <GameResult control={control} />
+          <GameResult isLoading={isLoading} control={control} />
         </Box>
       </DialogContent>
       <DialogActions>

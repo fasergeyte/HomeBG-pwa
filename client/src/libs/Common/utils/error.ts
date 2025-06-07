@@ -10,6 +10,6 @@ export function error(...errors: unknown[]) {
         : JSON.stringify(e, null, 2)
     )
     .join(" ");
-  console.error(errors);
+  errors.forEach((e) => console.error(e));
   alert(msg);
 }

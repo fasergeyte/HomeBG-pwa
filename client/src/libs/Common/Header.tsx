@@ -9,11 +9,16 @@ import {
   Typography,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useState } from "react";
 import { error } from ".";
 import { AuthMenuItem } from "./AuthMenuItem";
+import {
+  addTestGames,
+  addTestPlayers,
+  generateTestPlayedGames,
+} from "@libs/Dev";
 import { IndexedDBBackup } from "@libs/Store";
 
 interface HeaderProps {
@@ -27,6 +32,7 @@ export function Header(props: HeaderProps) {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [isTestDataLoading, setIsTestDataLoading] = useState(false);
 
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
@@ -94,6 +100,66 @@ export function Header(props: HeaderProps) {
           >
             Скачать бэкап файл
           </MenuItem>
+          {import.meta.env.NODE_ENV !== "production" && [
+            <MenuItem
+              key="add-pgame"
+              disabled={isSyncing}
+              onClick={async () => {
+                setIsTestDataLoading(true);
+                try {
+                  await generateTestPlayedGames({
+                    fromDate: new Date(2019, 0, 1),
+                    toDate: new Date(),
+                    quantity: 1000,
+                  });
+                } catch (e) {
+                  error("Sync error", e);
+                }
+                setIsTestDataLoading(false);
+              }}
+            >
+              dev gen payedGames
+              {isTestDataLoading && (
+                <CircularProgress sx={{ ml: 1 }} size={16} />
+              )}
+            </MenuItem>,
+            <MenuItem
+              key="add-player"
+              disabled={isTestDataLoading}
+              onClick={async () => {
+                setIsTestDataLoading(true);
+                try {
+                  await addTestPlayers();
+                } catch (e) {
+                  error("Sync error", e);
+                }
+                setIsTestDataLoading(false);
+              }}
+            >
+              dev add players
+              {isTestDataLoading && (
+                <CircularProgress sx={{ ml: 1 }} size={16} />
+              )}
+            </MenuItem>,
+            <MenuItem
+              key="add-game"
+              disabled={isTestDataLoading}
+              onClick={async () => {
+                setIsTestDataLoading(true);
+                try {
+                  await addTestGames();
+                } catch (e) {
+                  error("Sync error", e);
+                }
+                setIsTestDataLoading(false);
+              }}
+            >
+              dev add games
+              {isTestDataLoading && (
+                <CircularProgress sx={{ ml: 1 }} size={16} />
+              )}
+            </MenuItem>,
+          ]}
         </MenuList>
       </Drawer>
     </>

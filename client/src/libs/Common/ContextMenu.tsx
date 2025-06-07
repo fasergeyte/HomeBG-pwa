@@ -1,8 +1,8 @@
 import { MenuItem, Theme } from "@mui/material";
 import Box from "@mui/material/Box";
 import Menu from "@mui/material/Menu";
-import { SystemStyleObject } from "@mui/system";
-import { ReactNode, useState } from "react";
+import type { SystemStyleObject } from "@mui/system";
+import { type ReactNode, useState } from "react";
 
 export type ContextMenuItem<T> = { label: string; action: (value: T) => void };
 

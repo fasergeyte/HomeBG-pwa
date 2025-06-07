@@ -10,7 +10,7 @@ import { Players } from "@libs/Players";
 import AccessibilityNewIcon from "@mui/icons-material/AccessibilityNew";
 import CasinoIcon from "@mui/icons-material/Casino";
 import Diversity3Icon from "@mui/icons-material/Diversity3";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router";
 import { HomeSection, UrlParams, paths } from "@libs/Routing";
 
 export function Home() {

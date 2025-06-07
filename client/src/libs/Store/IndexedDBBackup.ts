@@ -125,7 +125,11 @@ export class IndexedDBBackup {
           ) as IDBBackup;
           resolve(backup);
         } catch (error) {
-          reject(new Error("Failed to parse backup file"));
+          reject(
+            new Error(
+              "Failed to parse backup file\n" + JSON.stringify(error, null, 2)
+            )
+          );
         }
       };
       reader.onerror = () => {
@@ -140,58 +144,56 @@ export class IndexedDBBackup {
    * @param backup Объект бэкапа
    * @returns Promise, который разрешается после завершения восстановления
    */
-static async restoreBackup(backup: IDBBackup): Promise<void> {
+  static async restoreBackup(backup: IDBBackup): Promise<void> {
     return new Promise((resolve, reject) => {
       // Сначала удаляем существующую базу, если она есть
       const deleteRequest = indexedDB.deleteDatabase(backup.dbName);
-      
+
       deleteRequest.onsuccess = () => {
         // Создаем новую базу с нужной версией
         const openRequest = indexedDB.open(backup.dbName, backup.version || 1);
-        
+
         openRequest.onupgradeneeded = (event) => {
           const db = (event.target as IDBOpenDBRequest).result;
-          
+
           // Создаем хранилища и индексы
           Object.values(backup.objectStores).forEach((storeBackup) => {
-            const store = db.createObjectStore(
-              storeBackup.name, 
-              { 
-                keyPath: storeBackup.keyPath, 
-                autoIncrement: storeBackup.autoIncrement 
-              }
-            );
-            
+            const store = db.createObjectStore(storeBackup.name, {
+              keyPath: storeBackup.keyPath,
+              autoIncrement: storeBackup.autoIncrement,
+            });
+
             // Создаем индексы
             Object.values(storeBackup.indexes).forEach((index) => {
-              store.createIndex(
-                index.name, 
-                index.keyPath, 
-                { unique: index.unique, multiEntry: index.multiEntry }
-              );
+              store.createIndex(index.name, index.keyPath, {
+                unique: index.unique,
+                multiEntry: index.multiEntry,
+              });
             });
           });
         };
-        
+
         openRequest.onsuccess = (event) => {
           const db = (event.target as IDBOpenDBRequest).result;
-          
+
           // Получаем массив имен хранилищ
           const storeNames = Object.keys(backup.objectStores);
-          
+
           // Заполняем хранилища данными
-          const transaction = db.transaction(storeNames, 'readwrite');
-          
+          const transaction = db.transaction(storeNames, "readwrite");
+
           transaction.oncomplete = () => {
             db.close();
             resolve();
           };
-          
+
           transaction.onerror = (e) => {
             db.close();
-            reject(new Error(`Transaction error: ${(e.target as IDBRequest).error}`));
+            reject(
+              new Error(`Transaction error: ${(e.target as IDBRequest).error}`)
+            );
           };
-          
+
           Object.values(backup.objectStores).forEach((storeBackup) => {
             const store = transaction.objectStore(storeBackup.name);
             storeBackup.data.forEach((item) => {
@@ -199,14 +201,26 @@ static async restoreBackup(backup: IDBBackup): Promise<void> {
             });
           });
         };
-        
+
         openRequest.onerror = (event) => {
-          reject(new Error(`Failed to open database: ${(event.target as IDBOpenDBRequest).error}`));
+          reject(
+            new Error(
+              `Failed to open database: ${
+                (event.target as IDBOpenDBRequest).error
+              }`
+            )
+          );
         };
       };
-      
+
       deleteRequest.onerror = (event) => {
-        reject(new Error(`Failed to delete database: ${(event.target as IDBOpenDBRequest).error}`));
+        reject(
+          new Error(
+            `Failed to delete database: ${
+              (event.target as IDBOpenDBRequest).error
+            }`
+          )
+        );
       };
     });
   }

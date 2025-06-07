@@ -1,39 +1,36 @@
-import { Box, Fab, List, Typography } from "@mui/material";
-import { useStoreDelete, useStoreGetAll } from "@libs/Store";
+import { Box, Fab, Typography } from "@mui/material";
+import { useStoreGetAll } from "@libs/Store";
 import AddIcon from "@mui/icons-material/Add";
-import { ContextMenu, ContextMenuItem } from "@libs/Common";
-import { PlayedGameListItem } from "./PlayedGameListItem";
+import { PlayedGameListItemShell } from "./PlayedGameListItem";
 import { useMemo } from "react";
 import { orderBy } from "lodash";
-import { useNavigate } from "react-router-dom";
-import { paths } from "@libs/Routing/paths";
+
 import { PlayedGamesRouter } from "./PlayedGamesRouter";
+import { FixedSizeList, ListChildComponentProps } from "react-window";
+import { paths } from "@libs/Routing";
+import { Link } from "react-router";
 
-export function PlayedGames() {
+export const PlayedGames = function PlayedGames() {
   const { data: playedGames } = useStoreGetAll("playedGame");
-  const { mutateAsync: deletePlayedGame } = useStoreDelete("playedGame");
 
-  const navigate = useNavigate();
   const sortedGames = useMemo(
     () => orderBy(playedGames?.sort(), ["date", "id"], ["desc", "desc"]),
     [playedGames]
   );
 
-  const onAdd = () => navigate(paths.playedGameDialog.getUrl());
-  const onEdit = (id: string) =>
-    navigate(paths.playedGameDialog.getUrl({ id }));
-
-  const actions: ContextMenuItem<string>[] = [
-    {
-      label: "Удалить",
-      action: (id) => deletePlayedGame(id),
-    },
-  ];
+  const renderRow = ({ index, style }: ListChildComponentProps) => {
+    const playedGame = sortedGames[index];
+    return (
+      <div style={style}>
+        <PlayedGameListItemShell playedGame={playedGame} />
+      </div>
+    );
+  };
 
   return (
     <Box height={"100%"} px={1} position={"relative"}>
       <PlayedGamesRouter />
-      <List
+      <Box
         sx={{
           position: "absolute",
           bottom: 0,
@@ -43,27 +40,38 @@ export function PlayedGames() {
           px: 1,
           py: 0,
           overflowX: "hidden",
-          overflowY: "scroll",
         }}
       >
-        {sortedGames?.length === 0 && (
+        {sortedGames?.length === 0 ? (
           <Typography variant="h6" color={"GrayText"} textAlign={"center"}>
             Список пуст
           </Typography>
+        ) : (
+          <FixedSizeList
+            height={window.innerHeight}
+            width="100%"
+            itemSize={72}
+            itemCount={sortedGames.length}
+            overscanCount={5}
+          >
+            {renderRow}
+          </FixedSizeList>
         )}
-        {sortedGames?.map((playedGame) => (
-          <ContextMenu key={playedGame.id} id={playedGame.id} actions={actions}>
-            <PlayedGameListItem onClick={onEdit} playedGame={playedGame} />
-          </ContextMenu>
-        ))}
-      </List>
-      <Fab
-        onClick={onAdd}
-        sx={{ bottom: 16, right: 16, position: "absolute" }}
-        color="primary"
+      </Box>
+      <Link
+        to={paths.playedGameDialog.getUrl()}
+        style={{
+          textDecoration: "none", // Убираем подчёркивание
+          display: "inline-flex", // Чтобы Fab не терял форму
+        }}
       >
-        <AddIcon />
-      </Fab>
+        <Fab
+          sx={{ bottom: 16, right: 16, position: "absolute" }}
+          color="primary"
+        >
+          <AddIcon />
+        </Fab>
+      </Link>
     </Box>
   );
-}
+};

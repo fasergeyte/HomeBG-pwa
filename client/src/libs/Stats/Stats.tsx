@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import { PlayersStatsCard } from "./PlayersStatsCard";
 import { UrlParams } from "@libs/Routing";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { useStats } from "./lib/useStats";
 import { useStoreGetAllAsMap } from "@libs/Store";
 

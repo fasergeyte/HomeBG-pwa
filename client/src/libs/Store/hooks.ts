@@ -14,7 +14,9 @@ export const getStoreGetQueryKey = (store: StoreName, id?: string | number) => [
 export function useStoreGetAll<Name extends StoreName>(store: Name) {
   return useQuery({
     queryKey: getStoreGetQueryKey(store),
-    queryFn: () => getDb().then((db) => db.getAll(store)),
+    queryFn: () => {
+      return getDb().then((db) => db.getAll(store));
+    },
   });
 }
 
