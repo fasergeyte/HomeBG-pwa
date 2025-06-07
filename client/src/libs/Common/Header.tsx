@@ -19,6 +19,7 @@ import {
   addTestPlayers,
   generateTestPlayedGames,
 } from "@libs/Dev";
+import { IndexedDBBackup } from "@libs/Store";
 
 interface HeaderProps {
   title: string;
@@ -91,6 +92,13 @@ export function Header(props: HeaderProps) {
           >
             Синхронизация
             {isSyncing && <CircularProgress sx={{ ml: 1 }} size={16} />}
+          </MenuItem>
+          <MenuItem
+            onClick={async () => {
+              IndexedDBBackup.createAndDownloadBackup();
+            }}
+          >
+            Скачать бэкап файл
           </MenuItem>
           {import.meta.env.NODE_ENV !== "production" && [
             <MenuItem
