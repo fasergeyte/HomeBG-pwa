@@ -1,9 +1,21 @@
 import { useStoreGetAll } from "@libs/Store";
+import { PickerRangeValue } from "@mui/x-date-pickers/internals";
 import { useMemo } from "react";
+import { isAfter, isBefore, startOfDay } from "date-fns";
+import { isNil } from "lodash";
 
 interface GameStats {
+  /**
+   * Общее количество партий
+   */
   total: number;
+  /**
+   * Первое место
+   */
   wins: number;
+  /**
+   * Не первое место
+   */
   defeats: number;
 }
 
@@ -12,8 +24,31 @@ interface PlayersStats {
   gamesStats: Record<string, GameStats>;
 }
 
-export function useStats(playerId: string | undefined) {
-  const { data: playedGames } = useStoreGetAll("playedGame");
+export function useStats(
+  playerId: string | undefined,
+  filter?: { dataRange?: PickerRangeValue }
+) {
+  const startDate = isNil(filter?.dataRange?.[0])
+    ? null
+    : startOfDay(filter.dataRange[0]);
+  const endDate = isNil(filter?.dataRange?.[1])
+    ? null
+    : startOfDay(filter.dataRange[1]);
+
+  const { data: playedGamesAll } = useStoreGetAll("playedGame");
+
+  const playedGames = playedGamesAll?.filter((g) => {
+    if (!isNil(startDate) && isBefore(g.date, startDate)) {
+      return false;
+    }
+
+    if (!isNil(endDate) && isAfter(g.date, endDate)) {
+      return false;
+    }
+
+    return true;
+  });
+
   return useMemo(
     () =>
       playedGames?.reduce<PlayersStats>(

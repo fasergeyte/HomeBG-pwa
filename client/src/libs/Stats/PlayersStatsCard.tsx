@@ -12,11 +12,10 @@ interface PlayersStatsCardProps {
   title: string;
   total: number;
   wins: number;
-  defeats: number;
 }
 
 export function PlayersStatsCard(props: PlayersStatsCardProps) {
-  const { title, defeats, total, wins } = props;
+  const { title, total, wins } = props;
   return (
     <Card sx={{ p: 1, mb: 1 }}>
       <Typography variant="h6" color="primary">
@@ -32,10 +31,6 @@ export function PlayersStatsCard(props: PlayersStatsCardProps) {
             <TableRow>
               <TableCell>Победы</TableCell>
               <TableCell>{wins}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>Поражения</TableCell>
-              <TableCell>{defeats}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Винрейт</TableCell>

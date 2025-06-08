@@ -82,6 +82,6 @@ export const PlayedGameListItemShell = memo(function PlayedGameListItemShell(
           </Typography>
         </Box>
       </ListItemButton>
-          </ContextMenu>
+    </ContextMenu>
   );
 });

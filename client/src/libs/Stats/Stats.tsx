@@ -1,25 +1,40 @@
-import { Box } from "@mui/material";
+import { Box, Card, Typography } from "@mui/material";
 import { PlayersStatsCard } from "./PlayersStatsCard";
 import { UrlParams } from "@libs/Routing";
 import { useParams } from "react-router";
 import { useStats } from "./lib/useStats";
-import { useStoreGetAllAsMap } from "@libs/Store";
+import { useStoreGet, useStoreGetAllAsMap } from "@libs/Store";
+import { DateRangePicker } from "@mui/x-date-pickers-pro";
+import { useState } from "react";
+import { PickerRangeValue } from "@mui/x-date-pickers/internals";
 
 export function Stats() {
   const params = useParams<UrlParams<"playerStats">>();
   const playerId = params.id;
+  const { data: player } = useStoreGet("player", playerId);
   const { map: gamesMap } = useStoreGetAllAsMap("game");
-  const stats = useStats(playerId);
+  const [dateRange, setDateRange] = useState<PickerRangeValue>([null, null]);
+
+  const stats = useStats(playerId, { dataRange: dateRange });
 
   return (
     <Box sx={{ p: 1, overflow: "scroll" }}>
+      <Card sx={{ mb: 1, p: 1 }}>
+        <Typography variant="h5">{player?.name}</Typography>
+        <DateRangePicker
+          label={"Период"}
+          sx={{ width: 1 }}
+          value={dateRange}
+          onChange={(value) => setDateRange(value)}
+          format="dd.MM.yyyy"
+        />
+      </Card>
       {stats && (
         <PlayersStatsCard
           key={"all"}
           title="Все игры"
           total={stats.total.total}
           wins={stats.total.wins}
-          defeats={stats.total.defeats}
         />
       )}
       {stats &&
@@ -29,7 +44,6 @@ export function Stats() {
             title={gamesMap?.get(gameId)?.name ?? ""}
             total={gameStats.total}
             wins={gameStats.wins}
-            defeats={gameStats.defeats}
           />
         ))}
     </Box>

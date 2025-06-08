@@ -50,7 +50,7 @@ export const PlayedGames = function PlayedGames() {
           <FixedSizeList
             height={window.innerHeight}
             width="100%"
-            itemSize={72}
+            itemSize={76}
             itemCount={sortedGames.length}
             overscanCount={5}
           >
