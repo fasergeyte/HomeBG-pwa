@@ -218,7 +218,7 @@ export const migrations = [
     /**
      * Добавляем meta-store
      */
-    version: 6,
+    version: 7,
     structure: (
       db: DataBase,
       _oldVer: number,
@@ -235,11 +235,20 @@ export const migrations = [
       const gameStore = transaction.objectStore("game");
       const playerStore = transaction.objectStore("player");
       const playedGameStore = transaction.objectStore("playedGame");
-      [gameStore, playerStore, playedGameStore].forEach((store) => {
-        if (!store.indexNames.contains("modifiedAt")) {
-          store.createIndex?.("modifiedAt", "modifiedAt");
-        }
-      });
+
+      if (!gameStore.indexNames.contains("modifiedAt")) {
+        gameStore.createIndex?.("modifiedAt", "modifiedAt", { unique: false });
+      }
+      if (!playerStore.indexNames.contains("modifiedAt")) {
+        playerStore.createIndex?.("modifiedAt", "modifiedAt", {
+          unique: false,
+        });
+      }
+      if (!playedGameStore.indexNames.contains("modifiedAt")) {
+        playedGameStore.createIndex?.("modifiedAt", "modifiedAt", {
+          unique: false,
+        });
+      }
     },
   },
 ];

@@ -77,7 +77,7 @@ export function GameResult(props: {
             control={control}
             render={({ field: { onChange, ...props } }) => (
               <Autocomplete
-                onChange={(e, val) => {
+                onChange={(_e, val) => {
                   onChange(val);
                 }}
                 fullWidth={true}

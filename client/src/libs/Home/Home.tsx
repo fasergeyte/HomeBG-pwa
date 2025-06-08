@@ -36,7 +36,7 @@ export function Home() {
       <BottomNavigation
         showLabels
         value={section}
-        onChange={(event, section) => {
+        onChange={(_event, section) => {
           navigate(paths.home.getUrl({ section }));
         }}
       >

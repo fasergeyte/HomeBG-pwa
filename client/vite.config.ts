@@ -46,7 +46,9 @@ export default defineConfig(({ mode }) => {
         },
       }),
       checker({
-        typescript: true,
+        typescript: {
+          tsconfigPath: "./tsconfig.app.json",
+        },
         overlay: false,
         eslint: {
           useFlatConfig: true,

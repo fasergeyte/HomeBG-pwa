@@ -20,6 +20,7 @@ import {
   generateTestPlayedGames,
 } from "@libs/Dev";
 import { IndexedDBBackup } from "@libs/Store";
+import { sync } from "@libs/SyncService/SyncService";
 
 interface HeaderProps {
   title: string;
@@ -83,7 +84,7 @@ export function Header(props: HeaderProps) {
             onClick={async () => {
               setIsSyncing(true);
               try {
-                // TODO: sync
+                await sync();
               } catch (e) {
                 error("Sync error", e);
               }

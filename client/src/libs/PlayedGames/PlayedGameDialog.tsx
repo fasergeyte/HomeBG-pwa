@@ -170,7 +170,7 @@ export function PlayedGameDialog() {
               <Autocomplete
                 fullWidth={true}
                 sx={{ mt: 1 }}
-                onChange={(e, val) => {
+                onChange={(_e, val) => {
                   onChange(val);
                 }}
                 freeSolo={true}
