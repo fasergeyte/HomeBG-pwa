@@ -17,7 +17,7 @@ interface PlayersStatsCardProps {
 export function PlayersStatsCard(props: PlayersStatsCardProps) {
   const { title, total, wins } = props;
   return (
-    <Card sx={{ p: 1, mb: 1 }}>
+    <Card sx={{ p: 1 }} elevation={2}>
       <Typography variant="h6" color="primary">
         {title}
       </Typography>
