@@ -14,7 +14,7 @@ export const PlayedGames = function PlayedGames() {
   const { data: playedGames } = useStoreGetAll("playedGame");
 
   const sortedGames = useMemo(
-    () => orderBy(playedGames?.sort(), ["date", "id"], ["desc", "desc"]),
+    () => orderBy(playedGames?.sort(), ["date", "modifiedAt"], ["desc", "desc"]),
     [playedGames]
   );
 

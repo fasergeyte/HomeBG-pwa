@@ -26,5 +26,6 @@
       "@libs/*": ["./src/libs/*"]
     }
   },
-  "include": ["./src/**/*.ts", "./src/**/*.tsx", "../shared/api.d.ts"]
+  "include": ["./src/**/*.ts", "./src/**/*.tsx", "../shared/api.d.ts"],
+  "exclude": ["./tests/**/*.ts", "./src/**/*.spec.ts", "./src/**/*.spec.tsx"]
 }

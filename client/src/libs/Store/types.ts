@@ -36,14 +36,10 @@ export interface BgDbSchema extends idb.DBSchema {
 export type DataBase = Omit<idb.IDBPDatabase<BgDbSchema>, "add"> & {
   add<Name extends idb.StoreNames<BgDbSchema>>(
     store: Name,
-    value: Omit<idb.StoreValue<BgDbSchema, Name>, "id">
+    value: Omit<idb.StoreValue<BgDbSchema, Name>, "id"> & {
+      id?: idb.StoreValue<BgDbSchema, Name>["id"];
+    }
   ): Promise<idb.StoreKey<BgDbSchema, Name>>;
-
-  getAllNewerThan<StoreName extends "player" | "game" | "playedGame">(
-    this: DataBase,
-    storeName: StoreName,
-    date: Date
-  ): Promise<BgDbSchema[StoreName]["value"][]>;
 };
 
 export type StoreName = idb.StoreNames<BgDbSchema>;

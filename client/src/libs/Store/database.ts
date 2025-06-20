@@ -14,6 +14,11 @@ export async function getDb() {
   return db;
 }
 
+export function closeDb() {
+  if (db) db.close();
+  db = null;
+}
+
 async function createDatabase() {
   const newVersion = config.dbVersion;
   let oldVersion: number | undefined = undefined;
@@ -42,14 +47,13 @@ async function createDatabase() {
     }
   }
 
-  Object.assign(db, { getAllNewerThan });
   return db;
 }
 
-async function getAllNewerThan<
+export async function getAllNewerThan<
   StoreName extends "player" | "game" | "playedGame"
->(this: DataBase, storeName: StoreName, date: Date) {
-  const tx = this.transaction(storeName, "readonly");
+>(db: DataBase, storeName: StoreName, date: Date) {
+  const tx = db.transaction(storeName, "readonly");
   const store = tx.objectStore(storeName);
 
   const index = store.index("modifiedAt");

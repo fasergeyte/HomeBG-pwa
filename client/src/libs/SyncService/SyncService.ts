@@ -1,4 +1,4 @@
-import { getDb } from "@libs/Store";
+import { getAllNewerThan, getDb } from "@libs/Store";
 import type { SyncRequest } from "bg-games-api";
 import { apiSyncPost } from "@libs/Api/api";
 
@@ -12,9 +12,9 @@ async function getSyncRequestData(): Promise<SyncRequest> {
   const meta = (await db.getAll("meta")).at(0);
   const lastSyncDate = meta?.syncDate ?? new Date(0);
 
-  const gamesP = db.getAllNewerThan("game", lastSyncDate);
-  const playersP = db.getAllNewerThan("player", lastSyncDate);
-  const playedGamesP = db.getAllNewerThan("playedGame", lastSyncDate);
+  const gamesP = getAllNewerThan(db, "game", lastSyncDate);
+  const playersP = getAllNewerThan(db, "player", lastSyncDate);
+  const playedGamesP = getAllNewerThan(db, "playedGame", lastSyncDate);
 
   return {
     lastSync: lastSyncDate.getTime(),
