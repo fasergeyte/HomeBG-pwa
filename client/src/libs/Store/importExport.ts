@@ -2,9 +2,9 @@ import { config } from "./config";
 import { closeDb } from "./database";
 
 /**
- * Утилиты для работы с бэкапами IndexedDB
+ * Утилиты для работы с импортом и экспортом
  */
-export class IndexedDBBackup {
+export class importExport {
   /**
    * Создает бэкап всех данных из IndexedDB
    * @param dbName Имя базы данных
@@ -219,8 +219,15 @@ export class IndexedDBBackup {
 
           Object.values(backup.objectStores).forEach((storeBackup) => {
             const store = transaction.objectStore(storeBackup.name);
-            storeBackup.data.forEach((item) => {
-              store.put(item);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            storeBackup.data.forEach((item: any) => {
+              const result = { ...item };
+              for (const key in item) {
+                result[key] = ["modifiedAt", "date"].includes(key)
+                  ? new Date(item[key])
+                  : item[key];
+              }
+              store.put(result);
             });
           });
         };

@@ -8,6 +8,7 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { ru } from "date-fns/locale";
 import { createAppTheme } from "./lib/createAppTheme";
 import { ApiProvider } from "../libs/Api/ApiContext";
+import { PwaGuard } from "./PwaGuard";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,16 +22,18 @@ const theme = createAppTheme();
 
 function App() {
   return (
-    <ApiProvider>
-      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ru}>
-        <QueryClientProvider client={queryClient}>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <Router />
-          </ThemeProvider>
-        </QueryClientProvider>
-      </LocalizationProvider>
-    </ApiProvider>
+    <PwaGuard>
+      <ApiProvider>
+        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ru}>
+          <QueryClientProvider client={queryClient}>
+            <ThemeProvider theme={theme}>
+              <CssBaseline />
+              <Router />
+            </ThemeProvider>
+          </QueryClientProvider>
+        </LocalizationProvider>
+      </ApiProvider>
+    </PwaGuard>
   );
 }
 

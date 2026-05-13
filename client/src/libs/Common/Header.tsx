@@ -12,7 +12,7 @@ import { useNavigate } from "react-router";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useState } from "react";
 import { error } from ".";
-import { IndexedDBBackup } from "@libs/Store";
+import { importExport } from "@libs/Store";
 import { useQueryClient } from "@tanstack/react-query";
 
 interface HeaderProps {
@@ -72,7 +72,7 @@ export function Header(props: HeaderProps) {
         <MenuList sx={{ width: 175 }}>
           <MenuItem
             onClick={async () => {
-              IndexedDBBackup.createAndDownloadBackup();
+              importExport.createAndDownloadBackup();
             }}
           >
             Экспорт
@@ -81,7 +81,7 @@ export function Header(props: HeaderProps) {
           <MenuItem
             onClick={async () => {
               try {
-                await IndexedDBBackup.importBackupFromFile();
+                await importExport.importBackupFromFile();
                 // Инвалидируем React Query кэши чтобы перезагрузить данные
                 queryClient.invalidateQueries();
               } catch (e) {
