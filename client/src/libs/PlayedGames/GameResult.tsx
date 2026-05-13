@@ -32,7 +32,7 @@ export function GameResult(props: {
     ) {
       append(
         { place: result.length + 1, player: null },
-        { shouldFocus: false }
+        { shouldFocus: false },
       );
     }
   }, [append, result, lastPlayer, fields.length]);
@@ -60,6 +60,7 @@ export function GameResult(props: {
                 size="small"
                 inputProps={field}
                 type="number"
+                enterKeyHint="next"
                 sx={{
                   width: "60px",
                   "& .MuiInputBase-root": {
@@ -82,6 +83,7 @@ export function GameResult(props: {
                 }}
                 fullWidth={true}
                 freeSolo={true}
+                enterKeyHint="next"
                 clearOnBlur={true}
                 autoSelect={true}
                 options={players ?? []}

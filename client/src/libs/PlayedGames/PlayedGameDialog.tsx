@@ -33,7 +33,7 @@ export function PlayedGameDialog() {
   const { data: editedGame, isLoading: editedGameIsLoading } = useStoreGet(
     "playedGame",
     id,
-    !id
+    !id,
   );
 
   const { data: players, isLoading: playersIsLoading } =
@@ -78,7 +78,7 @@ export function PlayedGameDialog() {
           }
 
           const existed = players?.find(
-            (p) => p.name.toLowerCase() === player.toLowerCase()
+            (p) => p.name.toLowerCase() === player.toLowerCase(),
           );
 
           if (existed) {
@@ -155,7 +155,16 @@ export function PlayedGameDialog() {
             name={"date"}
             control={control}
             render={({ field }) => (
-              <DatePicker label={"дата"} sx={{ width: 1 }} {...field} />
+              <DatePicker
+                label={"дата"}
+                sx={{ width: 1 }}
+                slotProps={{
+                  textField: {
+                    enterKeyHint: "next",
+                  },
+                }}
+                {...field}
+              />
             )}
           />
         )}
@@ -174,6 +183,7 @@ export function PlayedGameDialog() {
                   onChange(val);
                 }}
                 freeSolo={true}
+                enterKeyHint="next"
                 clearOnBlur={true}
                 autoSelect={true}
                 options={games ?? []}

@@ -61,13 +61,7 @@ export const PwaGuard: React.FC<PwaGuardProps> = ({ children, fallback }) => {
           Установить приложение
         </button>
       ) : (
-        // Инструкция для iOS или браузеров, где нет нативной установки
-        <div>
-          <p>
-            Нажмите на кнопку &quot;Поделиться&quot; и выберите &quot;На экран
-            \&quot;Домой\&quot;&quot;
-          </p>
-        </div>
+        <IOSInstallInstructions />
       )}
 
       {showBanner && (
@@ -89,3 +83,52 @@ export const PwaGuard: React.FC<PwaGuardProps> = ({ children, fallback }) => {
 
   return <>{showBanner ? fallback || <DefaultFallback /> : children}</>;
 };
+
+// Стилизованная инструкция для iOS
+const IOSInstallInstructions = () => (
+  <div>
+    <p style={{ marginBottom: "12px", color: "#495057" }}>
+      Как установить приложение:
+    </p>
+
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "8px",
+        flexWrap: "wrap",
+      }}
+    >
+      <span
+        style={{
+          backgroundColor: "#e3f2fd",
+          padding: "6px 12px",
+          borderRadius: "6px",
+          fontSize: "14px",
+          fontWeight: "500",
+        }}
+      >
+        <span style={{ color: "#1976d2" }}>«Поделиться»</span>
+      </span>
+
+      <span style={{ color: "#6c757d" }}>→</span>
+
+      <span
+        style={{
+          backgroundColor: "#e8f5e9",
+          padding: "6px 12px",
+          borderRadius: "6px",
+          fontSize: "14px",
+          fontWeight: "500",
+        }}
+      >
+        <span style={{ color: "#2e7d32" }}>«На экран Домой»</span>
+      </span>
+    </div>
+
+    <p style={{ marginTop: "12px", fontSize: "12px", color: "#6c757d" }}>
+      После установки приложение появится на главном экране
+    </p>
+  </div>
+);
