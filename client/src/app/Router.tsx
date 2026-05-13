@@ -1,4 +1,4 @@
-import { Route, BrowserRouter, Routes, Navigate } from "react-router";
+import { Route, Routes, Navigate, MemoryRouter } from "react-router";
 import { HomePage } from "./pages/HomePage";
 import { paths } from "@libs/Routing";
 import { StatsPage } from "./pages/StatsPage";
@@ -6,7 +6,7 @@ import { Auth } from "./Auth";
 
 export function Router() {
   return (
-    <BrowserRouter basename={import.meta.env.BASE_URL}>
+    <MemoryRouter basename={import.meta.env.BASE_URL}>
       <Routes>
         <Route path={paths.home.route} element={<HomePage />} />
         <Route path={paths.playerStats.route} element={<StatsPage />} />
@@ -16,6 +16,6 @@ export function Router() {
           element={<Navigate to={paths.home.getUrl()} replace={true} />}
         />
       </Routes>
-    </BrowserRouter>
+    </MemoryRouter>
   );
 }

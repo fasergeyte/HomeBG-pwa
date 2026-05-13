@@ -1,4 +1,5 @@
 import { config } from "./config";
+import { closeDb } from "./database";
 
 /**
  * Утилиты для работы с бэкапами IndexedDB
@@ -10,7 +11,7 @@ export class IndexedDBBackup {
    * @returns Promise с объектом бэкапа
    */
   static async createBackup(
-    dbName: string = config.dbName
+    dbName: string = config.dbName,
   ): Promise<IDBBackup> {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(dbName);
@@ -33,7 +34,7 @@ export class IndexedDBBackup {
         transaction.onerror = (e) => {
           db.close();
           reject(
-            new Error(`Transaction error: ${(e.target as IDBRequest).error}`)
+            new Error(`Transaction error: ${(e.target as IDBRequest).error}`),
           );
         };
 
@@ -67,7 +68,7 @@ export class IndexedDBBackup {
           dataRequest.onerror = (e) => {
             console.error(
               `Error getting data from ${storeName}:`,
-              (e.target as IDBRequest).error
+              (e.target as IDBRequest).error,
             );
           };
 
@@ -80,8 +81,8 @@ export class IndexedDBBackup {
           new Error(
             `Failed to open database: ${
               (event.target as IDBOpenDBRequest).error
-            }`
-          )
+            }`,
+          ),
         );
       };
     });
@@ -121,14 +122,14 @@ export class IndexedDBBackup {
       reader.onload = (event) => {
         try {
           const backup = JSON.parse(
-            event.target?.result as string
+            event.target?.result as string,
           ) as IDBBackup;
           resolve(backup);
         } catch (error) {
           reject(
             new Error(
-              "Failed to parse backup file\n" + JSON.stringify(error, null, 2)
-            )
+              "Failed to parse backup file\n" + JSON.stringify(error, null, 2),
+            ),
           );
         }
       };
@@ -145,25 +146,44 @@ export class IndexedDBBackup {
    * @returns Promise, который разрешается после завершения восстановления
    */
   static async restoreBackup(backup: IDBBackup): Promise<void> {
+    // Закрываем существующее соединение перед восстановлением
+    closeDb();
+
+    // Даем браузеру время на закрытие соединений
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
     return new Promise((resolve, reject) => {
-      // Сначала удаляем существующую базу, если она есть
+      // Сначала удаляем БД чтобы избежать конфликта версий
       const deleteRequest = indexedDB.deleteDatabase(backup.dbName);
 
       deleteRequest.onsuccess = () => {
-        // Создаем новую базу с нужной версией
-        const openRequest = indexedDB.open(backup.dbName, backup.version || 1);
+        openNewDatabase();
+      };
+
+      deleteRequest.onerror = (event) => {
+        const error = (event.target as IDBOpenDBRequest).error;
+        if (error?.name === "NotFoundError") {
+          openNewDatabase();
+        } else {
+          reject(
+            new Error(`Failed to delete database: ${error ?? "Unknown error"}`),
+          );
+        }
+      };
+
+      const openNewDatabase = () => {
+        const openRequest = indexedDB.open(backup.dbName, config.dbVersion);
 
         openRequest.onupgradeneeded = (event) => {
           const db = (event.target as IDBOpenDBRequest).result;
 
-          // Создаем хранилища и индексы
+          // Создаем новые хранилища и индексы из бэкапа
           Object.values(backup.objectStores).forEach((storeBackup) => {
             const store = db.createObjectStore(storeBackup.name, {
               keyPath: storeBackup.keyPath,
               autoIncrement: storeBackup.autoIncrement,
             });
 
-            // Создаем индексы
             Object.values(storeBackup.indexes).forEach((index) => {
               store.createIndex(index.name, index.keyPath, {
                 unique: index.unique,
@@ -175,11 +195,14 @@ export class IndexedDBBackup {
 
         openRequest.onsuccess = (event) => {
           const db = (event.target as IDBOpenDBRequest).result;
-
-          // Получаем массив имен хранилищ
           const storeNames = Object.keys(backup.objectStores);
 
-          // Заполняем хранилища данными
+          if (storeNames.length === 0) {
+            db.close();
+            resolve();
+            return;
+          }
+
           const transaction = db.transaction(storeNames, "readwrite");
 
           transaction.oncomplete = () => {
@@ -190,7 +213,7 @@ export class IndexedDBBackup {
           transaction.onerror = (e) => {
             db.close();
             reject(
-              new Error(`Transaction error: ${(e.target as IDBRequest).error}`)
+              new Error(`Transaction error: ${(e.target as IDBRequest).error}`),
             );
           };
 
@@ -207,20 +230,10 @@ export class IndexedDBBackup {
             new Error(
               `Failed to open database: ${
                 (event.target as IDBOpenDBRequest).error
-              }`
-            )
+              }`,
+            ),
           );
         };
-      };
-
-      deleteRequest.onerror = (event) => {
-        reject(
-          new Error(
-            `Failed to delete database: ${
-              (event.target as IDBOpenDBRequest).error
-            }`
-          )
-        );
       };
     });
   }
@@ -232,10 +245,32 @@ export class IndexedDBBackup {
    */
   static async createAndDownloadBackup(
     dbName?: string,
-    fileName?: string
+    fileName?: string,
   ): Promise<void> {
     const backup = await this.createBackup(dbName);
     this.saveBackupToFile(backup, fileName);
+  }
+
+  static async importBackupFromFile(file?: File): Promise<void> {
+    const fileToUse =
+      file ??
+      (await new Promise<File>((resolve, reject) => {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = "application/json,application/*+json";
+        input.onchange = () => {
+          const f = input.files?.[0];
+          if (f) resolve(f);
+          else reject(new Error("No file selected"));
+        };
+        input.onerror = () => reject(new Error("File input error"));
+        input.style.display = "none";
+        document.body.appendChild(input);
+        input.click();
+        document.body.removeChild(input);
+      }));
+    const backup = await this.loadBackupFromFile(fileToUse);
+    await this.restoreBackup(backup);
   }
 }
 
