@@ -5,8 +5,17 @@ import { StatsPage } from "./pages/StatsPage";
 import { Auth } from "./Auth";
 
 export function Router() {
+  const initialEntries = [
+    typeof window !== "undefined"
+      ? window.location.pathname
+      : import.meta.env.BASE_URL || "/",
+  ];
+
   return (
-    <MemoryRouter basename={import.meta.env.BASE_URL}>
+    <MemoryRouter
+      basename={import.meta.env.BASE_URL}
+      initialEntries={initialEntries}
+    >
       <Routes>
         <Route path={paths.home.route} element={<HomePage />} />
         <Route path={paths.playerStats.route} element={<StatsPage />} />
